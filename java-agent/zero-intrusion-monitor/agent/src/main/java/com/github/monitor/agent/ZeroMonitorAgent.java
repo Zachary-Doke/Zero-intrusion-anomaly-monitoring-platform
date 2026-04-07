@@ -19,7 +19,7 @@ public class ZeroMonitorAgent {
         
         try {
             AgentConfig.parse(agentArgs);
-            AgentConfig.syncRemoteConfigIfNeeded();
+            AgentConfig.syncRemoteConfigNow();
             
             // Start reporter thread early
             AsyncReporter.getInstance();
@@ -77,7 +77,7 @@ public class ZeroMonitorAgent {
         ElementMatcher.Junction<TypeDescription> matcher = ElementMatchers.none();
         
         if (AgentConfig.packages.isEmpty()) {
-            System.out.println("[MonitorAgent] No packages configured to monitor. Monitoring nothing.");
+            System.err.println("[MonitorAgent] No packages configured to monitor. Instrumentation disabled.");
             return matcher;
         }
         

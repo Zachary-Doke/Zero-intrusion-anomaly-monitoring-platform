@@ -50,6 +50,7 @@ public class AgentConfig {
     public static Set<String> traceKeys = new HashSet<String>();
     public static boolean enableThisSnapshot = false;
     public static boolean enableExperimentalLocalVars = false;
+    public static boolean deepSamplingEnabled = false;
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static volatile long lastConfigSyncEpochMs = 0L;
@@ -136,9 +137,16 @@ public class AgentConfig {
                     break;
                 case "enableThisSnapshot":
                     enableThisSnapshot = Boolean.parseBoolean(value);
+                    deepSamplingEnabled = enableThisSnapshot;
                     break;
                 case "enableExperimentalLocalVars":
                     enableExperimentalLocalVars = Boolean.parseBoolean(value);
+                    deepSamplingEnabled = enableExperimentalLocalVars || deepSamplingEnabled;
+                    break;
+                case "deepSamplingEnabled":
+                    deepSamplingEnabled = Boolean.parseBoolean(value);
+                    enableThisSnapshot = deepSamplingEnabled;
+                    enableExperimentalLocalVars = deepSamplingEnabled;
                     break;
                 default:
                     if (key.startsWith("sample.")) {
@@ -147,6 +155,14 @@ public class AgentConfig {
                     break;
             }
         }
+    }
+
+    public static synchronized void syncRemoteConfigNow() {
+        if (configEndpoint == null || configEndpoint.trim().isEmpty()) {
+            return;
+        }
+        lastConfigSyncEpochMs = System.currentTimeMillis();
+        pullRemoteConfig();
     }
 
     public static synchronized void syncRemoteConfigIfNeeded() {
@@ -216,7 +232,7 @@ public class AgentConfig {
         }
 
         Set<String> incomingPackages = parseCsv(stringValue(data.get("packagePatterns"), joinCsv(packages)));
-        if (!incomingPackages.equals(packages)) {
+        if (!incomingPackages.isEmpty() && !incomingPackages.equals(packages)) {
             packages = incomingPackages;
             changed = true;
         }
@@ -269,9 +285,11 @@ public class AgentConfig {
             changed = true;
         }
 
-        boolean incomingExperimental = booleanValue(data.get("deepSamplingEnabled"), enableExperimentalLocalVars);
-        if (incomingExperimental != enableExperimentalLocalVars) {
-            enableExperimentalLocalVars = incomingExperimental;
+        boolean incomingDeepSamplingEnabled = booleanValue(data.get("deepSamplingEnabled"), deepSamplingEnabled);
+        if (incomingDeepSamplingEnabled != deepSamplingEnabled) {
+            deepSamplingEnabled = incomingDeepSamplingEnabled;
+            enableThisSnapshot = incomingDeepSamplingEnabled;
+            enableExperimentalLocalVars = incomingDeepSamplingEnabled;
             changed = true;
         }
 

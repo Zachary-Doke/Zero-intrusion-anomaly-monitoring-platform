@@ -1,9 +1,12 @@
 package com.github.monitor.agent;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -92,29 +95,96 @@ public class AsyncReporter {
     }
 
     private void sendBatch(List<Event> events) {
+        String json;
         try {
-            String json = mapper.writeValueAsString(events);
+            json = mapper.writeValueAsString(events);
+        } catch (Exception e) {
+            System.err.println("[MonitorAgent] Failed to serialize batch: " + e.getMessage());
+            return;
+        }
+
+        Exception lastError = null;
+        for (int attempt = 1; attempt <= 2; attempt++) {
+            try {
+                sendBatchOnce(json);
+                return;
+            } catch (Exception e) {
+                lastError = e;
+                if (attempt == 1) {
+                    try {
+                        Thread.sleep(300L);
+                    } catch (InterruptedException interruptedException) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                }
+            }
+        }
+        if (lastError != null) {
+            System.err.println("[MonitorAgent] Report failed after retry: " + lastError.getMessage());
+        }
+    }
+
+    private void sendBatchOnce(String json) throws Exception {
+        HttpURLConnection conn = null;
+        try {
             URL url = new URL(AgentConfig.endpoint);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestProperty("X-Agent-Key", AgentConfig.agentApiKey);
             conn.setConnectTimeout(3000);
             conn.setReadTimeout(3000);
-            
+
             try (OutputStream os = conn.getOutputStream()) {
-                os.write(json.getBytes("UTF-8"));
+                os.write(json.getBytes(StandardCharsets.UTF_8));
                 os.flush();
             }
-            
+
             int code = conn.getResponseCode();
             if (code >= 400) {
-                System.err.println("[MonitorAgent] Report failed, code: " + code);
+                throw new IllegalStateException("http " + code + " " + readResponseBody(conn));
             }
-        } catch (Exception e) {
-            // Simple retry or just log
-            // System.err.println("[MonitorAgent] Report error: " + e.getMessage());
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+    }
+
+    private String readResponseBody(HttpURLConnection conn) {
+        if (conn == null) {
+            return "";
+        }
+        InputStream stream = null;
+        try {
+            stream = conn.getErrorStream();
+            if (stream == null) {
+                stream = conn.getInputStream();
+            }
+            if (stream == null) {
+                return "";
+            }
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            byte[] chunk = new byte[256];
+            int read;
+            while ((read = stream.read(chunk)) != -1) {
+                buffer.write(chunk, 0, read);
+            }
+            byte[] bytes = buffer.toByteArray();
+            String body = new String(bytes, StandardCharsets.UTF_8).trim();
+            return body.length() > 240 ? body.substring(0, 240) + "..." : body;
+        } catch (Exception ignored) {
+            return "";
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (Exception ignored) {
+                    // Ignore close failures.
+                }
+            }
         }
     }
 }
