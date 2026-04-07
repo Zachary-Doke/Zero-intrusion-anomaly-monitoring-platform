@@ -12,9 +12,5 @@ public class OverviewMetricDto {
     private long openExceptionCount;
     private long criticalExceptionCount;
     private long serviceCount;
-    private long triggeredAlertCount;
-    private long aiReportCount;
-    private long averageAnalysisMinutes;
-    private long agentCount;
     private long effectiveAgentCount;
 }

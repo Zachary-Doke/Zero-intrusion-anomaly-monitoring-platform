@@ -105,7 +105,7 @@ public class AgentSyncStatusService {
 
     public long countEffective(long targetVersion) {
         return repository.findAll().stream()
-                .filter(item -> targetVersion > 0 && targetVersion == safeLong(item.getLastSuccessfulConfigVersion()))
+                .filter(item -> targetVersion > 0 && safeLong(item.getLastSuccessfulConfigVersion()) >= targetVersion)
                 .count();
     }
 
@@ -143,7 +143,7 @@ public class AgentSyncStatusService {
                 status.getLastConfigSyncAt(),
                 status.getLastConfigSyncStatus(),
                 status.getLastConfigSyncError(),
-                targetVersion > 0 && targetVersion == successVersion
+                targetVersion > 0 && successVersion >= targetVersion
         );
     }
 

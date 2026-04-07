@@ -14,7 +14,6 @@ public class ExceptionListItemDto {
     private String summary;
     private String severity;
     private String status;
-    private String alertStatus;
     private String appName;
     private String serviceName;
     private String exceptionClass;

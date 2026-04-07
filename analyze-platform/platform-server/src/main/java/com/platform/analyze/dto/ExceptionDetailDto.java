@@ -14,10 +14,6 @@ public class ExceptionDetailDto {
     private String summary;
     private String severity;
     private String status;
-    private String alertStatus;
-    private Long alertCount;
-    private LocalDateTime alertTriggeredAt;
-    private String lastNotificationStatus;
     private String appName;
     private String serviceName;
     private String environment;
@@ -42,5 +38,6 @@ public class ExceptionDetailDto {
     private LocalDateTime lastConfigSyncAt;
     private String lastConfigSyncStatus;
     private String lastConfigSyncError;
+    private ExceptionSuggestionDto suggestion;
     private LocalDateTime occurrenceTime;
 }

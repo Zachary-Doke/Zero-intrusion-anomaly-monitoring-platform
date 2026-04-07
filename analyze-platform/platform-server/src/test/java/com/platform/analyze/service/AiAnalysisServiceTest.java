@@ -1,8 +1,8 @@
 package com.platform.analyze.service;
 
 import com.platform.analyze.ai.AiAnalysisService;
-import com.platform.analyze.dto.AiAnalysisResultDto;
 import com.platform.analyze.dto.ExceptionEventReq;
+import com.platform.analyze.dto.ExceptionSuggestionDto;
 import com.platform.analyze.repository.AiAnalysisResultRepository;
 import com.platform.analyze.repository.ExceptionEventRepository;
 import com.platform.analyze.repository.ExceptionFingerprintRepository;
@@ -41,26 +41,37 @@ class AiAnalysisServiceTest {
     }
 
     @Test
-    void shouldNotCreateDuplicateReportWhenAutoAndManualAnalyzeCoexist() {
-        for (int i = 0; i < 5; i++) {
-            exceptionService.saveEvent(buildEvent());
-        }
+    void shouldNotCreateDuplicateSuggestionWhenRequestedMultipleTimes() {
+        exceptionService.saveEvent(buildEvent());
         String fingerprint = fingerprintRepository.findAll().get(0).getFingerprint();
 
-        aiAnalysisService.analyze(fingerprint);
+        aiAnalysisService.generateSuggestion(fingerprint);
+        aiAnalysisService.generateSuggestion(fingerprint);
 
         assertThat(aiAnalysisResultRepository.count()).isEqualTo(1);
         assertThat(aiAnalysisResultRepository.findByFingerprint(fingerprint)).isPresent();
     }
 
     @Test
-    void shouldFallbackToHeuristicAnalysisWhenRemoteAiFails() {
+    void shouldExposeRootCauseBeforeSuggestionIsGenerated() {
         exceptionService.saveEvent(buildEvent());
         String fingerprint = fingerprintRepository.findAll().get(0).getFingerprint();
 
-        AiAnalysisResultDto result = aiAnalysisService.analyze(fingerprint);
+        ExceptionSuggestionDto result = aiAnalysisService.getSuggestionSnapshot(fingerprint);
 
-        assertThat(result.getProbableRootCause()).isNotBlank();
+        assertThat(result.getRootCauseAnalysis()).isNotBlank();
+        assertThat(result.getFixSuggestion()).isNull();
+    }
+
+    @Test
+    void shouldFallbackToHeuristicSuggestionWhenRemoteAiFails() {
+        exceptionService.saveEvent(buildEvent());
+        String fingerprint = fingerprintRepository.findAll().get(0).getFingerprint();
+
+        ExceptionSuggestionDto result = aiAnalysisService.generateSuggestion(fingerprint);
+
+        assertThat(result.getRootCauseAnalysis()).isNotBlank();
+        assertThat(result.getFixSuggestion()).isNotBlank();
         assertThat(aiAnalysisResultRepository.findByFingerprint(fingerprint).orElseThrow().getModelName())
                 .isEqualTo("heuristic-local");
     }

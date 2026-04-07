@@ -8,9 +8,6 @@ import java.util.List;
 
 @Repository
 public interface ExceptionFingerprintRepository extends JpaRepository<ExceptionFingerprint, String> {
-    List<ExceptionFingerprint> findTop8ByAlertStatusOrderByAlertTriggeredAtDesc(String alertStatus);
 
-    long countByAlertStatus(String alertStatus);
-
-    long countBySeverityAndAlertStatus(String severity, String alertStatus);
+    List<ExceptionFingerprint> findTop8ByOrderByOccurrenceCountDescLastSeenDesc();
 }

@@ -41,18 +41,6 @@ public class ExceptionFingerprint {
     private Long occurrenceCount;
 
     @Column(nullable = false)
-    private String alertStatus;
-
-    @Column
-    private LocalDateTime alertTriggeredAt;
-
-    @Column(nullable = false)
-    private Long alertCount;
-
-    @Column
-    private String lastNotificationStatus;
-
-    @Column(nullable = false)
     private LocalDateTime firstSeen;
 
     @Column(nullable = false)

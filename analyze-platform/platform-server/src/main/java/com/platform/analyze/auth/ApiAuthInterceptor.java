@@ -61,17 +61,11 @@ public class ApiAuthInterceptor implements HandlerInterceptor {
         if (path.startsWith("/api/dashboard")) {
             return UserRole.VIEWER;
         }
-        if (path.startsWith("/api/alerts")) {
-            return UserRole.VIEWER;
-        }
         if (path.startsWith("/api/exceptions")) {
-            return "PATCH".equalsIgnoreCase(method) ? UserRole.OPERATOR : UserRole.VIEWER;
-        }
-        if ("/api/ai/reports".equals(path)) {
+            if ("PATCH".equalsIgnoreCase(method) || path.endsWith("/suggestion")) {
+                return UserRole.OPERATOR;
+            }
             return UserRole.VIEWER;
-        }
-        if (path.startsWith("/api/ai/analyze")) {
-            return UserRole.OPERATOR;
         }
         if (path.startsWith("/api/settings")) {
             return UserRole.ADMIN;

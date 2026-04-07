@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -89,8 +90,19 @@ class ExceptionQueryControllerTest {
                         .header("Authorization", bearer(UserRole.VIEWER)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.length()").value(1))
-                .andExpect(jsonPath("$.data[0].occurrenceCount").value(5))
-                .andExpect(jsonPath("$.data[0].alertStatus").value("TRIGGERED"));
+                .andExpect(jsonPath("$.data[0].occurrenceCount").value(5));
+    }
+
+    @Test
+    void shouldGenerateSuggestionThroughHttpEndpoint() throws Exception {
+        exceptionService.saveEvent(buildEvent("payment-gateway", "CRITICAL", "payment timeout"));
+        Long id = eventRepository.findAll().get(0).getId();
+
+        mockMvc.perform(post("/api/exceptions/{id}/suggestion", id)
+                        .header("Authorization", bearer(UserRole.OPERATOR)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.rootCauseAnalysis").isNotEmpty())
+                .andExpect(jsonPath("$.data.fixSuggestion").isNotEmpty());
     }
 
     private ExceptionEventReq buildEvent(String serviceName, String severity, String message) {

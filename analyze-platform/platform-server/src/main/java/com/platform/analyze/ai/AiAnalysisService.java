@@ -2,22 +2,21 @@ package com.platform.analyze.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.platform.analyze.dto.AiAnalysisResultDto;
-import com.platform.analyze.dto.AiReportSummaryDto;
+import com.platform.analyze.config.DeepSeekProperties;
+import com.platform.analyze.dto.ExceptionSuggestionDto;
 import com.platform.analyze.entity.AiAnalysisResult;
 import com.platform.analyze.entity.ExceptionFingerprint;
+import com.platform.analyze.entity.RuleSettings;
 import com.platform.analyze.repository.AiAnalysisResultRepository;
 import com.platform.analyze.repository.ExceptionFingerprintRepository;
+import com.platform.analyze.service.RuleSettingsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -26,212 +25,192 @@ public class AiAnalysisService {
     private static final Logger log = LoggerFactory.getLogger(AiAnalysisService.class);
 
     private final DeepSeekClient deepSeekClient;
+    private final DeepSeekProperties deepSeekProperties;
+    private final RuleSettingsService ruleSettingsService;
     private final AiAnalysisResultRepository resultRepository;
     private final ExceptionFingerprintRepository fingerprintRepository;
     private final ObjectMapper objectMapper;
 
     public AiAnalysisService(DeepSeekClient deepSeekClient,
+                             DeepSeekProperties deepSeekProperties,
+                             RuleSettingsService ruleSettingsService,
                              AiAnalysisResultRepository resultRepository,
                              ExceptionFingerprintRepository fingerprintRepository,
                              ObjectMapper objectMapper) {
         this.deepSeekClient = deepSeekClient;
+        this.deepSeekProperties = deepSeekProperties;
+        this.ruleSettingsService = ruleSettingsService;
         this.resultRepository = resultRepository;
         this.fingerprintRepository = fingerprintRepository;
         this.objectMapper = objectMapper;
     }
 
-    public AiAnalysisResultDto analyze(String fingerprintId) {
-        return analyzeInternal(fingerprintId, "MANUAL", false);
+    public ExceptionSuggestionDto getSuggestionSnapshot(String fingerprintId) {
+        ExceptionFingerprint fingerprint = loadFingerprint(fingerprintId);
+        return resultRepository.findByFingerprint(fingerprintId)
+                .map(entity -> toSnapshot(entity, fingerprint))
+                .orElseGet(() -> buildRootCauseOnly(fingerprint, "READY", null));
     }
 
-    public AiAnalysisResultDto analyzeIfAbsent(String fingerprintId, String triggerSource) {
-        return analyzeInternal(fingerprintId, triggerSource, true);
-    }
-
-    private AiAnalysisResultDto analyzeInternal(String fingerprintId, String triggerSource, boolean reuseExisting) {
-        Optional<AiAnalysisResult> cachedResult = resultRepository.findByFingerprint(fingerprintId);
-        if (cachedResult.isPresent()) {
-            AiAnalysisResult entity = cachedResult.get();
-            if (reuseExisting || "RUNNING".equalsIgnoreCase(entity.getReportStatus())) {
-                return buildResultDto(entity);
-            }
+    public ExceptionSuggestionDto generateSuggestion(String fingerprintId) {
+        ExceptionFingerprint fingerprint = loadFingerprint(fingerprintId);
+        Optional<AiAnalysisResult> existing = resultRepository.findByFingerprint(fingerprintId);
+        if (existing.isPresent() && "COMPLETED".equalsIgnoreCase(existing.get().getReportStatus())) {
+            return toSnapshot(existing.get(), fingerprint);
         }
 
-        ExceptionFingerprint fingerprint = fingerprintRepository.findById(fingerprintId)
-                .orElseThrow(() -> new RuntimeException("找不到指定的异常指纹: " + fingerprintId));
-        LocalDateTime requestedAt = LocalDateTime.now();
-        AiAnalysisResult entity = cachedResult.orElseGet(AiAnalysisResult::new);
+        RuleSettings settings = ruleSettingsService.currentSettings();
+        AiAnalysisResult entity = existing.orElseGet(AiAnalysisResult::new);
+        LocalDateTime now = LocalDateTime.now();
         entity.setFingerprint(fingerprintId);
-        entity.setTitle(buildTitle(fingerprint));
-        entity.setReportStatus("PENDING");
-        entity.setModelName(deepSeekClient.currentModelName());
-        entity.setSummary(null);
-        entity.setAnalysisContent(null);
-        entity.setTriggerSource(triggerSource);
-        entity.setRequestedAt(requestedAt);
-        entity.setStartedAt(null);
-        entity.setErrorMessage(null);
-        entity.setAnalysisTime(requestedAt);
-        resultRepository.save(entity);
-
-        LocalDateTime startedAt = LocalDateTime.now();
+        entity.setTitle(fingerprint.getServiceName() + " / " + fingerprint.getExceptionClass() + " 处理建议");
+        entity.setTriggerSource("DETAIL_ACTION");
+        entity.setRequestedAt(now);
+        entity.setStartedAt(now);
         entity.setReportStatus("RUNNING");
-        entity.setStartedAt(startedAt);
+        entity.setModelName(settings.getAiModel());
+        entity.setSummary(null);
+        entity.setErrorMessage(null);
+        entity.setAnalysisTime(now);
         resultRepository.save(entity);
 
         try {
             String content;
             String modelName;
             try {
-                content = stripMarkdown(deepSeekClient.chatCompletion(buildPrompt(fingerprint)));
-                modelName = deepSeekClient.currentModelName();
+                content = stripMarkdown(deepSeekClient.chatCompletion(
+                        buildPrompt(settings, fingerprint),
+                        chooseValue(settings.getAiApiKey(), deepSeekProperties.getApiKey()),
+                        chooseValue(settings.getAiBaseUrl(), deepSeekProperties.getBaseUrl()),
+                        chooseValue(settings.getAiModel(), deepSeekProperties.getModel()),
+                        deepSeekProperties.getTimeout()
+                ));
+                modelName = chooseValue(settings.getAiModel(), deepSeekProperties.getModel());
             } catch (Exception ex) {
-                log.warn("AI 外部调用失败，降级为本地启发式分析: {}", ex.getMessage());
-                content = buildHeuristicJson(fingerprint);
+                log.warn("AI 外部调用失败，降级为本地启发式建议: {}", ex.getMessage());
+                content = writeJson(buildHeuristicSuggestion(fingerprint));
                 modelName = "heuristic-local";
             }
 
-            AiAnalysisResultDto dto = parseJson(content);
-            entity.setTitle(buildTitle(fingerprint));
+            ExceptionSuggestionDto suggestion = parseJson(content);
+            normalizeSuggestion(suggestion, fingerprint, "COMPLETED", LocalDateTime.now());
+
             entity.setReportStatus("COMPLETED");
             entity.setModelName(modelName);
-            entity.setSummary(dto.getProbableRootCause());
-            entity.setAnalysisContent(content);
-            entity.setAnalysisTime(LocalDateTime.now());
-            entity.setTriggerSource(triggerSource);
+            entity.setSummary(suggestion.getRootCauseAnalysis());
+            entity.setAnalysisContent(writeJson(suggestion));
+            entity.setAnalysisTime(suggestion.getSuggestionUpdatedAt());
             entity.setErrorMessage(null);
             resultRepository.save(entity);
-            return dto;
-        } catch (Exception ex) {
+            return suggestion;
+        } catch (RuntimeException ex) {
             entity.setReportStatus("FAILED");
-            entity.setAnalysisTime(LocalDateTime.now());
             entity.setErrorMessage(ex.getMessage());
+            entity.setAnalysisTime(LocalDateTime.now());
             resultRepository.save(entity);
-            throw ex;
+            return buildRootCauseOnly(fingerprint, "FAILED", LocalDateTime.now());
         }
     }
 
-    public List<AiReportSummaryDto> getReports(String keyword, String status) {
-        return resultRepository.findAll().stream()
-                .sorted(Comparator.comparing(AiAnalysisResult::getRequestedAt).reversed())
-                .filter(item -> !StringUtils.hasText(status) || item.getReportStatus().equalsIgnoreCase(status))
-                .filter(item -> matchKeyword(item, keyword))
-                .map(this::toSummaryDto)
-                .toList();
+    private ExceptionFingerprint loadFingerprint(String fingerprintId) {
+        return fingerprintRepository.findById(fingerprintId)
+                .orElseThrow(() -> new RuntimeException("找不到指定的异常指纹: " + fingerprintId));
     }
 
-    public long averageAnalysisMinutes() {
-        List<AiAnalysisResult> items = resultRepository.findAll();
-        if (items.isEmpty()) {
-            return 0L;
+    private ExceptionSuggestionDto toSnapshot(AiAnalysisResult entity, ExceptionFingerprint fingerprint) {
+        if ("COMPLETED".equalsIgnoreCase(entity.getReportStatus()) && StringUtils.hasText(entity.getAnalysisContent())) {
+            ExceptionSuggestionDto suggestion = parseJson(entity.getAnalysisContent());
+            normalizeSuggestion(suggestion, fingerprint, "COMPLETED", entity.getAnalysisTime());
+            return suggestion;
         }
-        return Math.max(1L, Math.round(items.stream()
-                .filter(item -> "COMPLETED".equalsIgnoreCase(item.getReportStatus()))
-                .filter(item -> item.getStartedAt() != null && item.getAnalysisTime() != null)
-                .map(item -> Duration.between(item.getStartedAt(), item.getAnalysisTime()).toMinutes())
-                .mapToLong(Long::longValue)
-                .average()
-                .orElse(8D)));
+        return buildRootCauseOnly(fingerprint, entity.getReportStatus(), entity.getAnalysisTime());
     }
 
-    private boolean matchKeyword(AiAnalysisResult item, String keyword) {
-        if (!StringUtils.hasText(keyword)) {
-            return true;
-        }
-        String pattern = keyword.trim().toLowerCase(Locale.ROOT);
-        return item.getTitle().toLowerCase(Locale.ROOT).contains(pattern)
-                || item.getFingerprint().toLowerCase(Locale.ROOT).contains(pattern)
-                || contains(item.getSummary(), pattern)
-                || contains(item.getErrorMessage(), pattern);
-    }
-
-    private String buildPrompt(ExceptionFingerprint fingerprint) {
-        return String.format(
-                "你是异常分析平台主管工程师，请根据以下数据输出 JSON。\n" +
-                        "异常类型: %s\n" +
-                        "服务: %s\n" +
-                        "摘要: %s\n" +
-                        "栈顶方法: %s\n" +
-                        "方法签名: %s\n" +
-                        "发生次数: %d\n" +
-                        "首次发生: %s\n" +
-                        "最近发生: %s\n" +
-                        "请返回 probableRootCause、impactScope、troubleshootingSteps、fixSuggestion 四个字段。",
-                fingerprint.getExceptionClass(),
-                fingerprint.getServiceName(),
-                fingerprint.getSummary(),
-                fingerprint.getTopStackFrame(),
-                fingerprint.getMethodSignature(),
-                fingerprint.getOccurrenceCount(),
-                fingerprint.getFirstSeen(),
-                fingerprint.getLastSeen()
-        );
-    }
-
-    private String buildHeuristicJson(ExceptionFingerprint fingerprint) {
-        String probableRootCause = "异常集中出现在 " + fingerprint.getServiceName()
-                + " 的 " + fingerprint.getTopStackFrame() + "，初步判断为代码路径缺少边界校验或下游依赖不稳定。";
-        String impactScope = "该指纹累计出现 " + fingerprint.getOccurrenceCount()
-                + " 次，影响范围至少覆盖 " + fingerprint.getServiceName() + " 的调用链。";
-        List<String> steps = List.of(
-                "优先复现 " + fingerprint.getTopStackFrame() + " 相关调用，核对输入参数与线程上下文",
-                "检查最近一次发布、配置变更和依赖服务响应超时情况",
-                "对异常前后的 traceId 与日志片段做串联，确认是否存在固定触发条件"
-        );
-        String fixSuggestion = "在 " + fingerprint.getMethodSignature()
-                + " 增加参数校验、兜底分支和异常降级策略，并为关键依赖补充超时与重试边界。";
-        try {
-            return objectMapper.writeValueAsString(new AiAnalysisResultDtoBuilder(probableRootCause, impactScope, steps, fixSuggestion).build());
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("构造本地 AI 报告失败", e);
-        }
-    }
-
-    private String buildTitle(ExceptionFingerprint fingerprint) {
-        return fingerprint.getServiceName() + " / " + fingerprint.getExceptionClass() + " 根因分析";
-    }
-
-    private AiReportSummaryDto toSummaryDto(AiAnalysisResult item) {
-        AiAnalysisResultDto dto = item.getAnalysisContent() == null ? null : parseJson(item.getAnalysisContent());
-        return new AiReportSummaryDto(
-                item.getFingerprint(),
-                item.getTitle(),
-                item.getReportStatus(),
-                item.getModelName(),
-                item.getTriggerSource(),
-                item.getSummary(),
-                dto == null ? null : dto.getFixSuggestion(),
-                item.getErrorMessage(),
-                item.getRequestedAt(),
-                item.getStartedAt(),
-                item.getAnalysisTime()
-        );
-    }
-
-    private AiAnalysisResultDto buildResultDto(AiAnalysisResult entity) {
-        if (entity.getAnalysisContent() != null) {
-            return parseJson(entity.getAnalysisContent());
-        }
-        AiAnalysisResultDto dto = new AiAnalysisResultDto();
-        if ("FAILED".equalsIgnoreCase(entity.getReportStatus())) {
-            dto.setProbableRootCause(entity.getErrorMessage());
-            dto.setFixSuggestion("请修复失败原因后重新触发 AI 分析。");
-            return dto;
-        }
-        dto.setProbableRootCause("AI 报告正在生成中");
-        dto.setFixSuggestion("稍后刷新列表查看最新状态。");
+    private ExceptionSuggestionDto buildRootCauseOnly(ExceptionFingerprint fingerprint,
+                                                      String status,
+                                                      LocalDateTime updatedAt) {
+        ExceptionSuggestionDto dto = new ExceptionSuggestionDto();
+        dto.setRootCauseAnalysis("异常集中出现在 " + fingerprint.getServiceName()
+                + " 的 " + fingerprint.getTopStackFrame()
+                + "，初步判断为该代码路径缺少边界校验，或其依赖链路存在不稳定响应。");
+        dto.setImpactScope("该指纹已累计出现 " + fingerprint.getOccurrenceCount()
+                + " 次，持续影响 " + fingerprint.getServiceName() + " 的相关调用。");
+        dto.setTroubleshootingSteps(null);
+        dto.setFixSuggestion(null);
+        dto.setSuggestionStatus(status);
+        dto.setSuggestionUpdatedAt(updatedAt);
         return dto;
     }
 
-    private boolean contains(String value, String keyword) {
-        return value != null && value.toLowerCase(Locale.ROOT).contains(keyword);
+    private ExceptionSuggestionDto buildHeuristicSuggestion(ExceptionFingerprint fingerprint) {
+        return new ExceptionSuggestionDto(
+                "异常集中出现在 " + fingerprint.getServiceName()
+                        + " 的 " + fingerprint.getTopStackFrame()
+                        + "，高概率是边界输入未校验、空值/状态不一致，或下游依赖超时导致。",
+                "该异常已出现 " + fingerprint.getOccurrenceCount()
+                        + " 次，影响范围至少覆盖 " + fingerprint.getServiceName() + " 当前调用链。",
+                List.of(
+                        "复现 " + fingerprint.getTopStackFrame() + " 对应调用，核对入参与上下文状态",
+                        "检查最近一次发布、配置变更和依赖服务响应耗时",
+                        "串联 traceId 与错误日志，确认是否存在固定触发条件"
+                ),
+                "在 " + fingerprint.getMethodSignature()
+                        + " 增加参数校验、空值兜底和异常降级策略，并为关键依赖补充超时与重试边界。",
+                "COMPLETED",
+                LocalDateTime.now()
+        );
     }
 
-    private AiAnalysisResultDto parseJson(String json) {
+    private String buildPrompt(RuleSettings settings, ExceptionFingerprint fingerprint) {
+        String template = chooseValue(settings.getAiPromptTemplate(), "");
+        if (!StringUtils.hasText(template)) {
+            template = "请分析异常并输出 JSON。异常类型: {{exception_class}}，服务: {{service_name}}，"
+                    + "摘要: {{summary}}，栈顶方法: {{top_stack_frame}}，方法签名: {{method_signature}}，"
+                    + "发生次数: {{occurrence_count}}，首次发生: {{first_seen}}，最近发生: {{last_seen}}。"
+                    + "请返回 rootCauseAnalysis、impactScope、troubleshootingSteps、fixSuggestion 四个字段。";
+        }
+        return template
+                .replace("{{exception_class}}", safeValue(fingerprint.getExceptionClass()))
+                .replace("{{service_name}}", safeValue(fingerprint.getServiceName()))
+                .replace("{{summary}}", safeValue(fingerprint.getSummary()))
+                .replace("{{top_stack_frame}}", safeValue(fingerprint.getTopStackFrame()))
+                .replace("{{method_signature}}", safeValue(fingerprint.getMethodSignature()))
+                .replace("{{occurrence_count}}", String.valueOf(fingerprint.getOccurrenceCount()))
+                .replace("{{first_seen}}", String.valueOf(fingerprint.getFirstSeen()))
+                .replace("{{last_seen}}", String.valueOf(fingerprint.getLastSeen()));
+    }
+
+    private void normalizeSuggestion(ExceptionSuggestionDto suggestion,
+                                     ExceptionFingerprint fingerprint,
+                                     String defaultStatus,
+                                     LocalDateTime defaultUpdatedAt) {
+        if (!StringUtils.hasText(suggestion.getRootCauseAnalysis())) {
+            suggestion.setRootCauseAnalysis(buildRootCauseOnly(fingerprint, defaultStatus, defaultUpdatedAt).getRootCauseAnalysis());
+        }
+        if (!StringUtils.hasText(suggestion.getImpactScope())) {
+            suggestion.setImpactScope("该异常已影响 " + fingerprint.getServiceName() + " 相关调用链。");
+        }
+        if (!StringUtils.hasText(suggestion.getSuggestionStatus())) {
+            suggestion.setSuggestionStatus(defaultStatus);
+        }
+        if (suggestion.getSuggestionUpdatedAt() == null) {
+            suggestion.setSuggestionUpdatedAt(defaultUpdatedAt);
+        }
+    }
+
+    private ExceptionSuggestionDto parseJson(String json) {
         try {
-            return objectMapper.readValue(json, AiAnalysisResultDto.class);
+            return objectMapper.readValue(json, ExceptionSuggestionDto.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("AI 返回格式无法解析", e);
+        }
+    }
+
+    private String writeJson(ExceptionSuggestionDto dto) {
+        try {
+            return objectMapper.writeValueAsString(dto);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("AI 结果序列化失败", e);
         }
     }
 
@@ -248,21 +227,11 @@ public class AiAnalysisService {
         return value.trim();
     }
 
-    private static final class AiAnalysisResultDtoBuilder {
-        private final AiAnalysisResultDto dto = new AiAnalysisResultDto();
+    private String chooseValue(String primary, String fallback) {
+        return StringUtils.hasText(primary) ? primary : fallback;
+    }
 
-        private AiAnalysisResultDtoBuilder(String probableRootCause,
-                                           String impactScope,
-                                           List<String> troubleshootingSteps,
-                                           String fixSuggestion) {
-            dto.setProbableRootCause(probableRootCause);
-            dto.setImpactScope(impactScope);
-            dto.setTroubleshootingSteps(troubleshootingSteps);
-            dto.setFixSuggestion(fixSuggestion);
-        }
-
-        private AiAnalysisResultDto build() {
-            return dto;
-        }
+    private String safeValue(String value) {
+        return value == null ? "" : value;
     }
 }

@@ -3,6 +3,7 @@ package com.platform.analyze.service;
 import com.platform.analyze.dto.ExceptionDetailDto;
 import com.platform.analyze.dto.ExceptionEventReq;
 import com.platform.analyze.dto.ExceptionOverviewDto;
+import com.platform.analyze.dto.ExceptionSuggestionDto;
 import com.platform.analyze.entity.ExceptionFingerprint;
 import com.platform.analyze.repository.ExceptionEventRepository;
 import com.platform.analyze.repository.ExceptionFingerprintRepository;
@@ -53,7 +54,24 @@ class ExceptionServiceTest {
     }
 
     @Test
-    void shouldTrackAlertLifecycleAndSyncState() {
+    void shouldMaskSensitiveValuesFoundOnlyInMessageText() {
+        ExceptionEventReq req = buildEvent(
+                "payment-gateway",
+                "HIGH",
+                "Invalid argument with data: {name=test-user, id=123, sensitive=password123}"
+        );
+
+        exceptionService.saveEvent(req);
+        Long eventId = eventRepository.findAll().get(0).getId();
+        ExceptionDetailDto detail = exceptionService.getEventDetail(eventId);
+
+        assertThat(detail.getMessage()).doesNotContain("password123").contains("sensitive=***");
+        assertThat(detail.getSummary()).doesNotContain("password123").contains("sensitive=***");
+        assertThat(detail.getStackTrace()).doesNotContain("password123").contains("sensitive=***");
+    }
+
+    @Test
+    void shouldTrackAgentSyncStateOnEventCapture() {
         for (int i = 0; i < 5; i++) {
             ExceptionEventReq req = buildEvent("payment-gateway", "CRITICAL", "provider timeout");
             req.setConfigVersion(3L);
@@ -64,14 +82,13 @@ class ExceptionServiceTest {
         ExceptionFingerprint fingerprint = fingerprintRepository.findAll().get(0);
         ExceptionDetailDto detail = exceptionService.getEventDetail(eventRepository.findAll().get(0).getId());
 
-        assertThat(fingerprint.getAlertStatus()).isEqualTo("TRIGGERED");
-        assertThat(fingerprint.getAlertCount()).isGreaterThanOrEqualTo(5);
+        assertThat(fingerprint.getOccurrenceCount()).isEqualTo(5);
         assertThat(detail.getConfigVersion()).isEqualTo(3L);
         assertThat(detail.getLastConfigSyncStatus()).isEqualTo("SUCCESS");
     }
 
     @Test
-    void shouldBuildOverviewWithAlertsAndAgents() {
+    void shouldBuildOverviewWithEffectiveAgents() {
         for (int i = 0; i < 5; i++) {
             ExceptionEventReq req = buildEvent("payment-gateway", "CRITICAL", "provider timeout");
             req.setConfigVersion(2L);
@@ -83,9 +100,24 @@ class ExceptionServiceTest {
 
         assertThat(overview.getMetrics().getTotalExceptions()).isEqualTo(5);
         assertThat(overview.getMetrics().getFingerprintCount()).isEqualTo(1);
-        assertThat(overview.getMetrics().getTriggeredAlertCount()).isGreaterThanOrEqualTo(1);
-        assertThat(overview.getMetrics().getAgentCount()).isGreaterThanOrEqualTo(1);
+        assertThat(overview.getMetrics().getEffectiveAgentCount()).isGreaterThanOrEqualTo(1);
         assertThat(overview.getTopFingerprints()).isNotEmpty();
+    }
+
+    @Test
+    void shouldExposeRootCauseAndSuggestionFromDetailWorkflow() {
+        exceptionService.saveEvent(buildEvent("checkout-api", "HIGH", "cart item missing"));
+        Long id = eventRepository.findAll().get(0).getId();
+
+        ExceptionDetailDto detail = exceptionService.getEventDetail(id);
+        ExceptionSuggestionDto suggestion = exceptionService.generateSuggestion(id);
+        ExceptionDetailDto refreshed = exceptionService.getEventDetail(id);
+
+        assertThat(detail.getSuggestion()).isNotNull();
+        assertThat(detail.getSuggestion().getRootCauseAnalysis()).isNotBlank();
+        assertThat(detail.getSuggestion().getFixSuggestion()).isNull();
+        assertThat(suggestion.getFixSuggestion()).isNotBlank();
+        assertThat(refreshed.getSuggestion().getFixSuggestion()).isNotBlank();
     }
 
     private ExceptionEventReq buildEvent(String serviceName, String severity, String message) {

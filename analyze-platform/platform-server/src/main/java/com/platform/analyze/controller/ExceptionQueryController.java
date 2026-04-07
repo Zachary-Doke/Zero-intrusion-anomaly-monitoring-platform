@@ -3,6 +3,7 @@ package com.platform.analyze.controller;
 import com.platform.analyze.common.Result;
 import com.platform.analyze.dto.ExceptionDetailDto;
 import com.platform.analyze.dto.ExceptionListItemDto;
+import com.platform.analyze.dto.ExceptionSuggestionDto;
 import com.platform.analyze.dto.ExceptionTrendDto;
 import com.platform.analyze.dto.StatusUpdateRequest;
 import com.platform.analyze.entity.ExceptionFingerprint;
@@ -17,6 +18,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,6 +59,12 @@ public class ExceptionQueryController {
     @PatchMapping("/{id}/status")
     public Result<ExceptionDetailDto> updateStatus(@PathVariable Long id, @Valid @RequestBody StatusUpdateRequest request) {
         return Result.success(exceptionService.updateStatus(id, request.getStatus()));
+    }
+
+    @Operation(summary = "为异常生成处理建议")
+    @PostMapping("/{id}/suggestion")
+    public Result<ExceptionSuggestionDto> generateSuggestion(@PathVariable Long id) {
+        return Result.success(exceptionService.generateSuggestion(id));
     }
 
     @Operation(summary = "查询异常指纹聚合结果")

@@ -39,16 +39,16 @@ public class RuleSettings {
     private Integer flushIntervalMs;
 
     @Column(nullable = false)
-    private Integer thresholdCount;
+    private String aiBaseUrl;
 
-    @Column(nullable = false)
-    private Integer thresholdWindowMinutes;
-
-    @Column(nullable = false, length = 1024)
-    private String alertRecipients;
+    @Column(nullable = false, length = 2048)
+    private String aiApiKey;
 
     @Column(nullable = false)
     private String aiModel;
+
+    @Column(nullable = false, length = 4096)
+    private String aiPromptTemplate;
 
     @Column(nullable = false, length = 1024)
     private String traceKeys;
