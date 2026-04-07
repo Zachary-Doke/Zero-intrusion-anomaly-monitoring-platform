@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>异常列表 - 异常分析平台</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#1E40AF",
+          "background-light": "#f8fafc",
+          "background-dark": "#111521",
+          "surface": "#ffffff",
+          "text-main": "#0f172a",
+          "muted": "#64748b",
+          "accent": "#e11d48",
+          "success": "#059669",
+          "warning": "#F59E0B",
+          "border-thin": "#e2e8f0"
+        },
+        fontFamily: {
+          "display": ["Manrope", "Noto Sans SC", "sans-serif"],
+          "sans": ["Noto Sans SC", "sans-serif"]
+        },
+        borderRadius: {"DEFAULT": "6px", "sm": "4px", "md": "6px", "lg": "12px", "xl": "0.75rem", "full": "9999px"},
+        boxShadow: {
+          'float': '0 4px 20px rgba(15, 23, 42, 0.03)',
+        }
+      },
+    },
+  }
+</script>
+<style>
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background-color: #F8FAFC;
+    color: #0f172a;
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+</style>
+</head>
+<body class="flex h-screen overflow-hidden">
+<!-- Shared SideNavBar -->
+<div class="relative flex h-full w-[240px] flex-col bg-[#f8f9fb] group/design-root overflow-x-hidden border-r border-[#e2e8f0] shrink-0">
+<div class="layout-container flex h-full grow flex-col">
+<div class="flex h-full flex-col justify-between p-4">
+<div class="flex flex-col gap-8">
+<div class="flex items-center gap-3 px-2 mt-2">
+<div class="bg-primary aspect-square rounded-md size-8 flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-size: 20px;">analytics</span>
+</div>
+<h1 class="text-[#0e111b] text-lg font-bold leading-normal tracking-tight">异常分析平台</h1>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-[#f1f5f9] cursor-pointer text-[#64748b] hover:text-[#0f172a] transition-colors">
+<div data-icon="dashboard">
+<span class="material-symbols-outlined">dashboard</span>
+</div>
+<p class="text-sm font-medium leading-normal">总览仪表盘</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-md bg-[#eff2fc] cursor-pointer group relative">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-primary rounded-r-full"></div>
+<div class="text-primary" data-icon="list_alt">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">list_alt</span>
+</div>
+<p class="text-primary text-sm font-semibold leading-normal">异常列表</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-[#f1f5f9] cursor-pointer text-[#64748b] hover:text-[#0f172a] transition-colors">
+<div data-icon="bar_chart">
+<span class="material-symbols-outlined">bar_chart</span>
+</div>
+<p class="text-sm font-medium leading-normal">分析报告</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-[#f1f5f9] cursor-pointer text-[#64748b] hover:text-[#0f172a] transition-colors">
+<div data-icon="settings">
+<span class="material-symbols-outlined">settings</span>
+</div>
+<p class="text-sm font-medium leading-normal">规则配置</p>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3 px-3 py-3 mt-auto border-t border-[#e2e8f0]">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8 bg-gray-200" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAGiJroTGOAtsKHYUldumYVbPFKMl20L7NPGUZYxH4SxDtcnlFVyne8SOZ9uOa_3HKnU10kyUUSm4m9FDwJ21opry3oXAwZtzWTX5q1yX6OyKcxCyxMLWQWfkgSZuEAzz0XCZ7VnK-TqjCxLjR3Er2jrr6iaNyW_IvrqPCZUxjg3RFBskta5FJwvirqdnLMt1x7PLoOl0r7r6MdCZTJLDbW0UN6EtNLe_Z1oLJ_j_2BhvuBZyIcQftW2jjA6SnrGn-2v_5LM91G3N8A');"></div>
+<div class="flex flex-col">
+<p class="text-sm font-semibold text-text-main">管理员</p>
+<p class="text-xs text-muted">admin@cleanops.io</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-full overflow-hidden">
+<!-- Header -->
+<header class="flex items-center justify-between px-8 py-6 shrink-0">
+<div class="flex flex-col">
+<h2 class="text-2xl font-bold text-text-main tracking-tight">异常列表</h2>
+<p class="text-sm text-muted mt-1">系统历史及当前的异常偏差记录</p>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-muted hover:text-text-main p-2 rounded-md hover:bg-white transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center rounded-md h-9 px-4 bg-primary text-white text-sm font-bold leading-normal transition-opacity hover:opacity-90">
+<span class="truncate">导出报告</span>
+</button>
+</div>
+</header>
+<div class="px-8 pb-8 flex-1 flex flex-col min-h-0">
+<div class="bg-surface rounded-lg border border-border-thin shadow-float flex flex-col h-full overflow-hidden">
+<!-- Filters Bar -->
+<div class="flex flex-wrap items-center justify-between gap-4 p-5 border-b border-border-thin">
+<div class="flex gap-3 items-center flex-wrap">
+<div class="relative group">
+<button class="flex h-9 items-center justify-center gap-x-2 rounded-md border border-border-thin bg-surface px-3 hover:border-muted transition-colors">
+<p class="text-text-main text-sm font-medium">严重程度: 全部</p>
+<span class="material-symbols-outlined text-muted text-[20px]">expand_more</span>
+</button>
+</div>
+<div class="relative group">
+<button class="flex h-9 items-center justify-center gap-x-2 rounded-md border border-border-thin bg-surface px-3 hover:border-muted transition-colors">
+<p class="text-text-main text-sm font-medium">系统: 全部</p>
+<span class="material-symbols-outlined text-muted text-[20px]">expand_more</span>
+</button>
+</div>
+<div class="relative group">
+<button class="flex h-9 items-center justify-center gap-x-2 rounded-md border border-border-thin bg-surface px-3 hover:border-muted transition-colors">
+<p class="text-text-main text-sm font-medium">时间范围: 最近7天</p>
+<span class="material-symbols-outlined text-muted text-[20px]">expand_more</span>
+</button>
+</div>
+<div class="h-6 w-px bg-border-thin mx-1"></div>
+<div class="flex gap-2">
+<div class="flex items-center gap-1.5 bg-background-light border border-border-thin rounded px-2.5 py-1">
+<span class="w-2 h-2 rounded-full bg-accent"></span>
+<span class="text-xs font-medium text-text-main">紧急</span>
+<button class="text-muted hover:text-text-main ml-1"><span class="material-symbols-outlined text-[14px]">close</span></button>
+</div>
+</div>
+</div>
+<div class="flex items-center bg-background-light px-3 py-1.5 rounded-md border border-border-thin">
+<span class="material-symbols-outlined text-muted text-[20px] mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm p-0 w-48" placeholder="搜索异常 ID 或 描述..." type="text"/>
+</div>
+</div>
+<!-- Data Table Container -->
+<div class="flex-1 overflow-auto">
+<table class="w-full text-left border-collapse whitespace-nowrap">
+<thead class="sticky top-0 bg-white z-10">
+<tr class="border-b border-border-thin">
+<th class="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider w-[180px]">时间戳</th>
+<th class="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider w-[140px]">严重程度</th>
+<th class="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider w-[120px]">ID</th>
+<th class="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider w-[160px]">系统</th>
+<th class="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider min-w-[250px]">描述</th>
+<th class="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider w-[120px]">状态</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-thin">
+<!-- Row 1: Critical -->
+<tr class="hover:bg-background-light transition-colors group cursor-pointer">
+<td class="px-6 py-4 font-mono text-sm text-text-main">
+<div class="font-medium">2023-10-27</div>
+<div class="text-muted text-xs">14:23:45 UTC</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-accent"></span>
+<span class="text-sm font-medium text-text-main">紧急</span>
+</div>
+</td>
+<td class="px-6 py-4 font-mono text-sm text-primary font-bold group-hover:underline">
+                    #ANM-8921
+                  </td>
+<td class="px-6 py-4 text-sm text-text-main font-medium">
+                    API 网关
+                  </td>
+<td class="px-6 py-4 text-sm text-text-main truncate max-w-[300px]" title="/v1/checkout 接口延迟峰值 &gt; 500ms">
+                    /v1/checkout 接口延迟峰值 &gt; 500ms
+                  </td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-50 text-accent border border-red-100">
+                      未解决
+                    </span>
+</td>
+</tr>
+<!-- Row 2: Warning -->
+<tr class="hover:bg-background-light transition-colors group cursor-pointer">
+<td class="px-6 py-4 font-mono text-sm text-text-main">
+<div class="font-medium">2023-10-27</div>
+<div class="text-muted text-xs">13:10:12 UTC</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-warning"></span>
+<span class="text-sm font-medium text-text-main">警告</span>
+</div>
+</td>
+<td class="px-6 py-4 font-mono text-sm text-primary font-bold group-hover:underline">
+                    #ANM-8920
+                  </td>
+<td class="px-6 py-4 text-sm text-text-main font-medium">
+                    支付服务
+                  </td>
+<td class="px-6 py-4 text-sm text-text-main truncate max-w-[300px]" title="上游供应商 5xx 错误率升高">
+                    上游供应商 5xx 错误率升高
+                  </td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-yellow-50 text-warning border border-yellow-100">
+                      调查中
+                    </span>
+</td>
+</tr>
+<!-- Row 3: Resolved -->
+<tr class="hover:bg-background-light transition-colors group cursor-pointer">
+<td class="px-6 py-4 font-mono text-sm text-text-main">
+<div class="font-medium">2023-10-26</div>
+<div class="text-muted text-xs">09:45:00 UTC</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-accent opacity-30"></span>
+<span class="text-sm font-medium text-muted">紧急</span>
+</div>
+</td>
+<td class="px-6 py-4 font-mono text-sm text-muted group-hover:text-primary transition-colors">
+                    #ANM-8919
+                  </td>
+<td class="px-6 py-4 text-sm text-muted">
+                    数据库集群
+                  </td>
+<td class="px-6 py-4 text-sm text-muted truncate max-w-[300px]">
+                    CPU 利用率持续 5 分钟达到 98%
+                  </td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-50 text-success border border-green-100">
+                      已解决
+                    </span>
+</td>
+</tr>
+<!-- Row 4: Resolved -->
+<tr class="hover:bg-background-light transition-colors group cursor-pointer">
+<td class="px-6 py-4 font-mono text-sm text-text-main">
+<div class="font-medium">2023-10-25</div>
+<div class="text-muted text-xs">22:14:05 UTC</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-warning opacity-30"></span>
+<span class="text-sm font-medium text-muted">警告</span>
+</div>
+</td>
+<td class="px-6 py-4 font-mono text-sm text-muted group-hover:text-primary transition-colors">
+                    #ANM-8918
+                  </td>
+<td class="px-6 py-4 text-sm text-muted">
+                    身份认证服务
+                  </td>
+<td class="px-6 py-4 text-sm text-muted truncate max-w-[300px]">
+                    欧洲地区检测到 Token 校验延迟
+                  </td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-50 text-success border border-green-100">
+                      已解决
+                    </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="flex items-center justify-between border-t border-border-thin px-6 py-4 bg-surface shrink-0">
+<p class="text-sm text-muted">
+              显示 <span class="font-semibold text-text-main">1</span> 到 <span class="font-semibold text-text-main">4</span> 条，共 <span class="font-semibold text-text-main">24</span> 条结果
+            </p>
+<div class="flex gap-2">
+<button class="px-3 py-1.5 text-sm font-medium text-muted bg-surface border border-border-thin rounded hover:bg-background-light transition-colors disabled:opacity-50" disabled="">
+                上一页
+              </button>
+<button class="px-3 py-1.5 text-sm font-medium text-text-main bg-surface border border-border-thin rounded hover:bg-background-light transition-colors">
+                下一页
+              </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

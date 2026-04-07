@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI 分析报告列表 - 异常分析平台</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#193db3",
+          "background-light": "#f6f6f8",
+          "background-dark": "#111521",
+          "text-main": "#0f172a",
+          "muted": "#64748b",
+          "border-thin": "#e2e8f0",
+          "accent-rose": "#E11D48"
+        },
+        fontFamily: {
+          "display": ["Manrope", "Noto Sans SC", "sans-serif"],
+          "sans": ["Noto Sans SC", "Manrope", "sans-serif"]
+        },
+        borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+      },
+    },
+  }
+</script>
+<style>
+  body {
+    font-family: 'Noto Sans SC', 'Manrope', sans-serif;
+    background-color: #F8FAFC;
+    color: #0F172A;
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+</style>
+</head>
+<body class="antialiased flex h-screen overflow-hidden bg-[#F8FAFC]">
+<!-- Sidebar Navigation -->
+<div class="sidebar-container relative flex h-full w-[240px] flex-col bg-[#f8f9fb] border-r border-[#e2e8f0] shrink-0 no-print">
+<div class="flex h-full flex-col justify-between p-4">
+<div class="flex flex-col gap-8">
+<div class="flex items-center gap-3 px-2 mt-2">
+<div class="bg-primary aspect-square rounded-md size-8 flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-size: 20px;">analytics</span>
+</div>
+<h1 class="text-[#0e111b] text-lg font-bold leading-normal tracking-tight">异常分析平台</h1>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-[#f1f5f9] cursor-pointer text-[#64748b] hover:text-[#0f172a] transition-colors group">
+<div data-icon="dashboard">
+<span class="material-symbols-outlined">dashboard</span>
+</div>
+<p class="text-sm font-medium leading-normal">总览仪表盘</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-[#f1f5f9] cursor-pointer text-[#64748b] hover:text-[#0f172a] transition-colors">
+<div data-icon="list_alt">
+<span class="material-symbols-outlined">list_alt</span>
+</div>
+<p class="text-sm font-medium leading-normal">异常列表</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-md bg-[#eff2fc] cursor-pointer group relative">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-primary rounded-r-full"></div>
+<div class="text-primary" data-icon="bar_chart">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bar_chart</span>
+</div>
+<p class="text-primary text-sm font-semibold leading-normal">分析报告</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-[#f1f5f9] cursor-pointer text-[#64748b] hover:text-[#0f172a] transition-colors">
+<div data-icon="settings">
+<span class="material-symbols-outlined">settings</span>
+</div>
+<p class="text-sm font-medium leading-normal">规则配置</p>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3 px-3 py-3 mt-auto border-t border-[#e2e8f0]">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8 bg-gray-200" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAGiJroTGOAtsKHYUldumYVbPFKMl20L7NPGUZYxH4SxDtcnlFVyne8SOZ9uOa_3HKnU10kyUUSm4m9FDwJ21opry3oXAwZtzWTX5q1yX6OyKcxCyxMLWQWfkgSZuEAzz0XCZ7VnK-TqjCxLjR3Er2jrr6iaNyW_IvrqPCZUxjg3RFBskta5FJwvirqdnLMt1x7PLoOl0r7r6MdCZTJLDbW0UN6EtNLe_Z1oLJ_j_2BhvuBZyIcQftW2jjA6SnrGn-2v_5LM91G3N8A');"></div>
+<div class="flex flex-col">
+<p class="text-sm font-semibold text-text-main">管理员</p>
+<p class="text-xs text-muted">admin@cleanops.io</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col items-center overflow-y-auto py-10 px-4 sm:px-6 lg:px-8">
+<!-- Document Container -->
+<div class="w-full max-w-[960px] bg-white rounded-lg shadow-[0_4px_20px_rgba(15,23,42,0.03)] border border-[#E2E8F0] overflow-hidden">
+<!-- Page Header -->
+<header class="flex flex-col sm:flex-row justify-between items-start sm:items-center px-8 pt-8 pb-6 border-b border-[#E2E8F0] gap-4">
+<div>
+<h1 class="text-[#0F172A] text-2xl font-bold leading-tight tracking-tight font-display mb-1">AI 分析报告列表</h1>
+<p class="text-[#64748B] text-sm font-normal">管理由 AI 模型自动生成的异常根因分析与修复建议报告</p>
+</div>
+<div class="flex items-center gap-2">
+</div>
+</header>
+<!-- Filters & Stats (Quick glance) -->
+<div class="px-8 py-4 bg-[#F8FAFC] border-b border-[#E2E8F0] flex flex-wrap items-center justify-between gap-4">
+<div class="flex items-center gap-6">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-wider text-muted font-bold">本周生成</span>
+<span class="text-lg font-bold text-text-main">42份</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-wider text-muted font-bold">待审核</span>
+<span class="text-lg font-bold text-accent-rose">5份</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted text-[18px]">search</span>
+<input class="pl-9 pr-4 py-1.5 border border-border-thin rounded-md text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none w-64" placeholder="搜索异常 ID 或报告标题..." type="text"/>
+</div>
+</div>
+</div>
+<!-- Report List -->
+<div class="divide-y divide-[#E2E8F0]">
+<!-- Report Item 1 -->
+<div class="px-8 py-6 hover:bg-[#FBFCFE] transition-colors flex items-start gap-6 group">
+<div class="mt-1 flex-shrink-0">
+<div class="size-10 rounded-full bg-blue-50 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">auto_awesome</span>
+</div>
+</div>
+<div class="flex-grow min-w-0">
+<div class="flex items-center justify-between mb-1">
+<h3 class="text-base font-semibold text-text-main truncate group-hover:text-primary transition-colors">异常分析报告: ERR-20231008-001</h3>
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-100">
+                  已完成
+                </span>
+</div>
+<div class="flex items-center gap-3 text-xs text-muted mb-3">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span> 2023-10-08 14:32:10
+                </span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">memory</span> 模型: GPT-4o-Turbo
+                </span>
+</div>
+<div class="bg-[#F8FAFC] border border-border-thin rounded p-3">
+<div class="flex items-start gap-2">
+<span class="text-[12px] font-bold text-primary uppercase mt-0.5 shrink-0">AI 修复建议:</span>
+<p class="text-sm text-text-main leading-relaxed">
+                    检测到数据库连接池耗尽。建议增加 `max_connections` 至 500，并检查 `OrderService` 中的长事务未释放连接点，优化连接回收逻辑。
+                  </p>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-2 shrink-0 self-center">
+<button class="flex items-center justify-center gap-1.5 h-8 px-3 rounded-md border border-border-thin bg-white text-sm font-medium text-text-main hover:bg-[#F8FAFC] transition-colors">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+<span>查看详情</span>
+</button>
+<button class="flex items-center justify-center gap-1.5 h-8 px-3 rounded-md border border-border-thin bg-white text-sm font-medium text-primary hover:bg-blue-50 transition-colors">
+<span class="material-symbols-outlined text-[16px]">download</span>
+<span>导出 PDF</span>
+</button>
+</div>
+</div>
+<!-- Report Item 2 -->
+<div class="px-8 py-6 hover:bg-[#FBFCFE] transition-colors flex items-start gap-6 group">
+<div class="mt-1 flex-shrink-0">
+<div class="size-10 rounded-full bg-blue-50 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">auto_awesome</span>
+</div>
+</div>
+<div class="flex-grow min-w-0">
+<div class="flex items-center justify-between mb-1">
+<h3 class="text-base font-semibold text-text-main truncate group-hover:text-primary transition-colors">支付网关高延迟根因分析</h3>
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-100">
+                  待审核
+                </span>
+</div>
+<div class="flex items-center gap-3 text-xs text-muted mb-3">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span> 2023-10-08 11:15:45
+                </span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">memory</span> 模型: Claude-3-Haiku
+                </span>
+</div>
+<div class="bg-[#F8FAFC] border border-border-thin rounded p-3 border-l-4 border-accent-rose">
+<div class="flex items-start gap-2">
+<span class="text-[12px] font-bold text-accent-rose uppercase mt-0.5 shrink-0">AI 修复建议:</span>
+<p class="text-sm text-text-main leading-relaxed">
+<span class="font-semibold text-accent-rose">关键警报:</span> 外部支付 API 响应超时。建议立即启用断路器熔断策略，并切换至备用渠道。系统已自动生成配置模板，请手动审批发布。
+                  </p>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-2 shrink-0 self-center">
+<button class="flex items-center justify-center gap-1.5 h-8 px-3 rounded-md bg-primary text-white text-sm font-medium hover:bg-[#15349e] transition-colors">
+<span class="material-symbols-outlined text-[16px]">verified_user</span>
+<span>立即审核</span>
+</button>
+<button class="flex items-center justify-center gap-1.5 h-8 px-3 rounded-md border border-border-thin bg-white text-sm font-medium text-text-main hover:bg-[#F8FAFC] transition-colors">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+<span>详情</span>
+</button>
+</div>
+</div>
+<!-- Report Item 3 -->
+<div class="px-8 py-6 hover:bg-[#FBFCFE] transition-colors flex items-start gap-6 group">
+<div class="mt-1 flex-shrink-0">
+<div class="size-10 rounded-full bg-blue-50 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">auto_awesome</span>
+</div>
+</div>
+<div class="flex-grow min-w-0">
+<div class="flex items-center justify-between mb-1">
+<h3 class="text-base font-semibold text-text-main truncate group-hover:text-primary transition-colors">容器 CPU 周期性波动分析</h3>
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-100">
+                  已完成
+                </span>
+</div>
+<div class="flex items-center gap-3 text-xs text-muted mb-3">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span> 2023-10-07 18:50:22
+                </span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">memory</span> 模型: GPT-4o-Turbo
+                </span>
+</div>
+<div class="bg-[#F8FAFC] border border-border-thin rounded p-3">
+<div class="flex items-start gap-2">
+<span class="text-[12px] font-bold text-primary uppercase mt-0.5 shrink-0">AI 修复建议:</span>
+<p class="text-sm text-text-main leading-relaxed">
+                    由于定时清理脚本冲突导致 CPU 突发，建议调整 CronJob 时间间隔，并将清理进程优先级 (niceness) 提高。
+                  </p>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-2 shrink-0 self-center">
+<button class="flex items-center justify-center gap-1.5 h-8 px-3 rounded-md border border-border-thin bg-white text-sm font-medium text-text-main hover:bg-[#F8FAFC] transition-colors">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+<span>查看详情</span>
+</button>
+<button class="flex items-center justify-center gap-1.5 h-8 px-3 rounded-md border border-border-thin bg-white text-sm font-medium text-primary hover:bg-blue-50 transition-colors">
+<span class="material-symbols-outlined text-[16px]">download</span>
+<span>导出 PDF</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Pagination -->
+<div class="px-8 py-6 border-t border-border-thin flex items-center justify-between bg-white">
+<p class="text-xs text-muted">显示 1 到 10 条，共 142 条报告</p>
+<div class="flex items-center gap-1">
+<button class="size-8 flex items-center justify-center rounded border border-border-thin hover:bg-[#F8FAFC] text-muted">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="size-8 flex items-center justify-center rounded bg-primary text-white text-xs font-bold">1</button>
+<button class="size-8 flex items-center justify-center rounded border border-border-thin hover:bg-[#F8FAFC] text-xs text-text-main">2</button>
+<button class="size-8 flex items-center justify-center rounded border border-border-thin hover:bg-[#F8FAFC] text-xs text-text-main">3</button>
+<span class="px-2 text-muted">...</span>
+<button class="size-8 flex items-center justify-center rounded border border-border-thin hover:bg-[#F8FAFC] text-xs text-text-main">15</button>
+<button class="size-8 flex items-center justify-center rounded border border-border-thin hover:bg-[#F8FAFC] text-muted">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="mt-8 text-center text-[#64748B] text-xs pb-10">
+<span>由 异常分析平台 (Clean Minimal) 自动生成分析报告列表</span>
+</footer>
+</main>
+</body></html>

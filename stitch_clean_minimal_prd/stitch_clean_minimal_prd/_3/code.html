@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#1E40AF",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#3755c3",
+                        "tertiary-fixed-dim": "#ffb3b6",
+                        "on-primary-fixed": "#001453",
+                        "surface-bright": "#f7f9fb",
+                        "surface-dim": "#d8dadc",
+                        "tertiary-container": "#9a002b",
+                        "on-surface": "#191c1e",
+                        "inverse-surface": "#2d3133",
+                        "on-background": "#191c1e",
+                        "surface": "#f7f9fb",
+                        "secondary": "#525c87",
+                        "on-secondary-fixed-variant": "#3b446e",
+                        "inverse-primary": "#b8c4ff",
+                        "on-tertiary-fixed": "#40000c",
+                        "on-primary-fixed-variant": "#173bab",
+                        "on-surface-variant": "#444653",
+                        "on-tertiary-container": "#ffa2a7",
+                        "on-secondary-fixed": "#0e1840",
+                        "tertiary": "#6f001c",
+                        "primary-container": "#1e40af",
+                        "inverse-on-surface": "#eff1f3",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffdada",
+                        "secondary-container": "#c3ccfe",
+                        "outline-variant": "#c4c5d5",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#4c5680",
+                        "background": "#f7f9fb",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#dde1ff",
+                        "surface-container-high": "#e6e8ea",
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "outline": "#757684",
+                        "surface-container-low": "#f2f4f6",
+                        "on-tertiary-fixed-variant": "#920028",
+                        "surface-container": "#eceef0",
+                        "primary-fixed": "#dde1ff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#a8b8ff",
+                        "surface-variant": "#e0e3e5",
+                        "secondary-fixed-dim": "#bbc4f6",
+                        "primary-fixed-dim": "#b8c4ff",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e0e3e5",
+                        "text-main": "#0f172a",
+                        "muted": "#64748b",
+                        "border-thin": "#e2e8f0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "6px",
+                        "sm": "4px",
+                        "md": "6px",
+                        "lg": "12px",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope", "Noto Sans SC", "sans-serif"],
+                        "body": ["Inter", "Noto Sans SC", "sans-serif"],
+                        "label": ["Inter", "Noto Sans SC", "sans-serif"],
+                        "display": ["Manrope", "Noto Sans SC", "sans-serif"]
+                    },
+                    "boxShadow": {
+                        'float': '0 4px 20px rgba(15, 23, 42, 0.03)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Noto Sans SC', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-glow {
+            box-shadow: 0 12px 32px -4px rgba(30, 64, 175, 0.08);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden bg-[#F8FAFC]">
+<!-- SideNavBar (Styled according to SCREEN_19) -->
+<div class="relative flex h-full w-[240px] flex-col bg-[#f8f9fb] group/design-root overflow-x-hidden border-r border-[#e2e8f0] shrink-0">
+<div class="layout-container flex h-full grow flex-col">
+<div class="flex h-full flex-col justify-between p-4">
+<div class="flex flex-col gap-8">
+<div class="flex items-center gap-3 px-2 mt-2">
+<div class="bg-primary aspect-square rounded-md size-8 flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-size: 20px;">analytics</span>
+</div>
+<h1 class="text-[#0e111b] text-lg font-bold leading-normal tracking-tight">异常分析平台</h1>
+</div>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-[#f1f5f9] cursor-pointer text-[#64748b] hover:text-[#0f172a] transition-colors group" href="#">
+<div data-icon="dashboard">
+<span class="material-symbols-outlined">dashboard</span>
+</div>
+<p class="text-sm font-medium leading-normal">总览仪表盘</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-[#f1f5f9] cursor-pointer text-[#64748b] hover:text-[#0f172a] transition-colors" href="#">
+<div data-icon="list_alt">
+<span class="material-symbols-outlined">list_alt</span>
+</div>
+<p class="text-sm font-medium leading-normal">异常列表</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-[#f1f5f9] cursor-pointer text-[#64748b] hover:text-[#0f172a] transition-colors" href="#">
+<div data-icon="bar_chart">
+<span class="material-symbols-outlined">bar_chart</span>
+</div>
+<p class="text-sm font-medium leading-normal">分析报告</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-md bg-[#eff2fc] cursor-pointer group relative" href="#">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-primary rounded-r-full"></div>
+<div class="text-primary" data-icon="settings">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">rule</span>
+</div>
+<p class="text-primary text-sm font-semibold leading-normal">规则配置</p>
+</a>
+</div>
+</div>
+<div class="flex items-center gap-3 px-3 py-3 mt-auto border-t border-[#e2e8f0]">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8 bg-gray-200" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAGiJroTGOAtsKHYUldumYVbPFKMl20L7NPGUZYxH4SxDtcnlFVyne8SOZ9uOa_3HKnU10kyUUSm4m9FDwJ21opry3oXAwZtzWTX5q1yX6OyKcxCyxMLWQWfkgSZuEAzz0XCZ7VnK-TqjCxLjR3Er2jrr6iaNyW_IvrqPCZUxjg3RFBskta5FJwvirqdnLMt1x7PLoOl0r7r6MdCZTJLDbW0UN6EtNLe_Z1oLJ_j_2BhvuBZyIcQftW2jjA6SnrGn-2v_5LM91G3N8A');"></div>
+<div class="flex flex-col">
+<p class="text-sm font-semibold text-text-main">管理员</p>
+<p class="text-xs text-muted">admin@cleanops.io</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-full overflow-y-auto">
+<!-- TopAppBar (Styled according to SCREEN_19) -->
+<!-- Configuration Logic Content -->
+<div class="p-8 max-w-5xl mx-auto space-y-8 w-full">
+<div class="flex justify-between items-end mb-4">
+<div>
+<h2 class="text-3xl font-bold font-headline text-on-surface tracking-tight">规则配置</h2>
+<p class="text-on-surface-variant text-sm mt-1">定制化异常检测引擎的逻辑、AI 模型及告警响应机制。</p>
+</div>
+<div class="flex gap-3">
+<button class="px-6 py-2.5 text-sm font-semibold text-primary hover:bg-white hover:shadow-sm transition-all rounded-lg">重置默认</button>
+<button class="px-8 py-2.5 bg-primary text-white text-sm font-semibold shadow-md active-glow hover:bg-primary-container transition-all rounded-lg">保存并应用</button>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-8">
+<!-- Section 1: Detection Logic -->
+<section class="col-span-12 lg:col-span-7 space-y-6">
+<div class="bg-white p-8 rounded-xl active-glow transition-all border border-border-thin shadow-float">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-10 h-10 bg-primary/10 text-primary flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<h3 class="text-lg font-bold font-headline">检测逻辑配置</h3>
+</div>
+<div class="space-y-6">
+<div class="grid gap-2">
+<label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">监控包名 (Package Name)</label>
+<input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-lg focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all text-sm font-mono" placeholder="com.example.service" type="text"/>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-high/40 rounded-lg">
+<div>
+<p class="text-sm font-bold">深度采样</p>
+<p class="text-xs text-on-surface-variant">启用后将对全链路堆栈进行递归分析</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="grid grid-cols-2 gap-6">
+<div class="grid gap-2">
+<label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">采集深度</label>
+<div class="relative">
+<input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-lg focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all text-sm font-headline font-bold" type="number" value="12"/>
+<span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">LAYER</span>
+</div>
+</div>
+<div class="grid gap-2">
+<label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">字符串限长</label>
+<div class="relative">
+<input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-lg focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all text-sm font-headline font-bold" type="number" value="1024"/>
+<span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">CHARS</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 3: Thresholds & Alerts -->
+<div class="bg-white p-8 rounded-xl active-glow transition-all border border-border-thin shadow-float">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-10 h-10 bg-error/10 text-error flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined">notification_important</span>
+</div>
+<h3 class="text-lg font-bold font-headline">阈值与告警</h3>
+</div>
+<div class="space-y-6">
+<div class="grid gap-2">
+<label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">触发阈值 (Threshold)</label>
+<div class="flex items-center gap-4">
+<input class="w-20 px-4 py-3 bg-surface-container-high border-none rounded-lg text-center font-bold font-headline" type="text" value="5"/>
+<span class="text-sm text-on-surface-variant">次 / 每</span>
+<select class="px-4 py-3 bg-surface-container-high border-none rounded-lg text-sm font-medium focus:ring-2 focus:ring-primary/20">
+<option>1 分钟</option>
+<option>5 分钟</option>
+<option>15 分钟</option>
+</select>
+</div>
+</div>
+<div class="grid gap-2">
+<label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">告警接收者</label>
+<div class="relative group">
+<textarea class="w-full px-4 py-3 bg-surface-container-high border-none rounded-lg focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all text-sm leading-relaxed" placeholder="输入邮箱，多个请用分号隔开..." rows="2">admin@enterprise.ai; security-team@enterprise.ai</textarea>
+<div class="absolute right-3 bottom-3 flex gap-1">
+<span class="bg-white px-2 py-0.5 rounded text-[10px] font-bold shadow-sm text-primary">2 CONTACTS</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: AI Interface Configuration (Side Card) -->
+<section class="col-span-12 lg:col-span-5 space-y-6">
+<div class="bg-white p-8 rounded-xl active-glow transition-all flex flex-col h-full border-l-4 border-primary border-y border-r border-border-thin shadow-float">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-10 h-10 bg-primary/10 text-primary flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined">auto_awesome</span>
+</div>
+<h3 class="text-lg font-bold font-headline">AI 接口配置</h3>
+</div>
+<div class="space-y-6 flex-1">
+<div class="grid gap-2">
+<label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">模型型号 (Model)</label>
+<div class="relative">
+<select class="w-full appearance-none px-4 py-3 bg-surface-container-high border-none rounded-lg text-sm font-medium focus:ring-2 focus:ring-primary/20">
+<option>GPT-4o (Omni)</option>
+<option>Claude 3.5 Sonnet</option>
+<option>DeepSeek-V2</option>
+<option>Llama 3 70B</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="grid gap-2">
+<label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">API Key</label>
+<div class="relative">
+<input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-lg focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all text-sm" type="password" value="sk-••••••••••••••••••••••••"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">visibility</span>
+</button>
+</div>
+</div>
+<div class="grid gap-2 flex-1">
+<label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">系统提示词 (Prompt Template)</label>
+<textarea class="w-full flex-1 px-4 py-3 bg-surface-container-high border-none rounded-lg focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all text-sm leading-relaxed resize-none min-h-[280px]" placeholder="定义 AI 的分析逻辑...">你是一名资深的系统安全专家。你的任务是分析传入的堆栈异常数据。
+
+请根据以下维度进行评估：
+1. 异常的严重程度 (1-10)
+2. 可能的触发原因
+3. 建议的修复方案
+
+回复必须以 JSON 格式输出。</textarea>
+</div>
+<div class="p-4 bg-primary/5 rounded-lg border border-primary/10">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-xl">info</span>
+<div>
+<p class="text-xs font-bold text-primary">Token 消耗预估</p>
+<p class="text-[10px] text-on-surface-variant mt-1 leading-normal">当前的提示词长度与监控频率预计每月消耗约 1.2M Tokens。建议在非核心服务上使用 Lite 模型。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer Metadata -->
+<div class="pt-8 pb-12 flex justify-between items-center text-slate-400">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-[10px] font-bold uppercase tracking-widest">System Operational</span>
+</div>
+<span class="text-[10px]">VER: 2.4.0-STABLE</span>
+</div>
+<div class="text-[10px] font-medium tracking-tight">
+                    上次更新时间: 2024-05-20 14:30:15 (BY ADMIN)
+                </div>
+</div>
+</div>
+</main>
+<!-- Visual Polish: Subtle Background Ornament -->
+<div class="fixed top-0 right-0 -z-10 w-1/2 h-1/2 bg-gradient-to-bl from-primary/5 to-transparent pointer-events-none"></div>
+</body></html>

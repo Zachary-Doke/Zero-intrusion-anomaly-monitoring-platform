@@ -1,0 +1,15 @@
+.DS_Store
+.codex
+.codex/
+.idea/
+.vscode/
+*.iml
+
+**/target/
+**/dist/
+**/.vite/
+**/dependency-reduced-pom.xml
+
+front/node_modules/
+
+*.log

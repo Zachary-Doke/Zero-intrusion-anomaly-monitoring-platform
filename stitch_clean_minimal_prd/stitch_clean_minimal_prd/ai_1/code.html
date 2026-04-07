@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>总览仪表盘 - 异常分析平台</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#1E40AF",
+          "background-light": "#f8fafc",
+          "background-dark": "#111521",
+          "surface": "#ffffff",
+          "text-main": "#0f172a",
+          "muted": "#64748b",
+          "accent": "#e11d48",
+          "success": "#059669",
+          "border-thin": "#e2e8f0"
+        },
+        fontFamily: {
+          "display": ["Manrope", "Noto Sans SC", "sans-serif"],
+          "body": ["Noto Sans SC", "sans-serif"]
+        },
+        borderRadius: {"DEFAULT": "6px", "sm": "4px", "md": "6px", "lg": "12px", "xl": "0.75rem", "full": "9999px"},
+        boxShadow: {
+          'float': '0 4px 20px rgba(15, 23, 42, 0.03)',
+        }
+      },
+    },
+  }
+</script>
+<style>
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background-color: #F8FAFC;
+    color: #0f172a;
+  }
+  .chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+  }
+  .sparkline {
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .sparkline-fill {
+    opacity: 0.1;
+  }
+  
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+</style>
+</head>
+<body class="flex h-screen overflow-hidden">
+<!-- Shared SideNavBar -->
+<div class="relative flex h-full w-[240px] flex-col bg-[#f8f9fb] group/design-root overflow-x-hidden border-r border-[#e2e8f0] shrink-0">
+<div class="layout-container flex h-full grow flex-col">
+<div class="flex h-full flex-col justify-between p-4">
+<div class="flex flex-col gap-8">
+<div class="flex items-center gap-3 px-2 mt-2">
+<div class="bg-primary aspect-square rounded-md size-8 flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-size: 20px;">analytics</span>
+</div>
+<h1 class="text-[#0e111b] text-lg font-bold leading-normal tracking-tight">异常分析平台</h1>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-md bg-[#eff2fc] cursor-pointer group relative">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-primary rounded-r-full"></div>
+<div class="text-primary" data-icon="dashboard">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+</div>
+<p class="text-primary text-sm font-semibold leading-normal">总览仪表盘</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-[#f1f5f9] cursor-pointer text-[#64748b] hover:text-[#0f172a] transition-colors">
+<div data-icon="list_alt">
+<span class="material-symbols-outlined">list_alt</span>
+</div>
+<p class="text-sm font-medium leading-normal">异常列表</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-[#f1f5f9] cursor-pointer text-[#64748b] hover:text-[#0f172a] transition-colors">
+<div data-icon="bar_chart">
+<span class="material-symbols-outlined">bar_chart</span>
+</div>
+<p class="text-sm font-medium leading-normal">分析报告</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-[#f1f5f9] cursor-pointer text-[#64748b] hover:text-[#0f172a] transition-colors">
+<div data-icon="settings">
+<span class="material-symbols-outlined">settings</span>
+</div>
+<p class="text-sm font-medium leading-normal">规则配置</p>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3 px-3 py-3 mt-auto border-t border-[#e2e8f0]">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8 bg-gray-200" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAGiJroTGOAtsKHYUldumYVbPFKMl20L7NPGUZYxH4SxDtcnlFVyne8SOZ9uOa_3HKnU10kyUUSm4m9FDwJ21opry3oXAwZtzWTX5q1yX6OyKcxCyxMLWQWfkgSZuEAzz0XCZ7VnK-TqjCxLjR3Er2jrr6iaNyW_IvrqPCZUxjg3RFBskta5FJwvirqdnLMt1x7PLoOl0r7r6MdCZTJLDbW0UN6EtNLe_Z1oLJ_j_2BhvuBZyIcQftW2jjA6SnrGn-2v_5LM91G3N8A');"></div>
+<div class="flex flex-col">
+<p class="text-sm font-semibold text-text-main">管理员</p>
+<p class="text-xs text-muted">admin@cleanops.io</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-full overflow-y-auto">
+<!-- Header -->
+<header class="flex items-center justify-between px-8 py-6 shrink-0">
+<div>
+<h2 class="text-2xl font-bold text-text-main tracking-tight">总览仪表盘</h2>
+<p class="text-sm text-muted mt-1">系统健康状况与实时异常检测</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 text-sm text-muted bg-white border border-border-thin rounded-md px-3 py-1.5 shadow-float">
+<span class="w-2 h-2 rounded-full bg-success"></span>
+          系统同步中
+        </div>
+<button class="text-muted hover:text-text-main p-2 rounded-md hover:bg-white transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<div class="px-8 pb-8 flex-1 flex flex-col gap-6 max-w-[1600px]">
+<!-- Metric Cards Row -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Card 1 -->
+<div class="bg-white rounded-md border border-border-thin p-5 shadow-float relative overflow-hidden group">
+<div class="flex justify-between items-start mb-2 relative z-10">
+<p class="text-sm font-medium text-muted">总异常量</p>
+<span class="material-symbols-outlined text-muted text-lg">swap_horiz</span>
+</div>
+<div class="flex items-baseline gap-2 relative z-10">
+<h3 class="text-[32px] font-bold text-text-main leading-tight font-display">124,592</h3>
+<span class="text-sm font-medium text-success bg-success/10 px-1.5 py-0.5 rounded text-[12px]">+5.2%</span>
+</div>
+<svg class="absolute bottom-0 left-0 w-full h-16 opacity-30" preserveaspectratio="none" viewbox="0 0 100 30">
+<path class="sparkline-fill fill-primary/20" d="M0,30 L0,20 Q10,15 20,25 T40,10 T60,20 T80,5 T100,15 L100,30 Z"></path>
+<path class="sparkline stroke-primary" d="M0,20 Q10,15 20,25 T40,10 T60,20 T80,5 T100,15"></path>
+</svg>
+</div>
+<!-- Card 2 -->
+<div class="bg-white rounded-md border border-border-thin p-5 shadow-float relative overflow-hidden">
+<div class="flex justify-between items-start mb-2 relative z-10">
+<p class="text-sm font-medium text-muted">系统健康分</p>
+<span class="material-symbols-outlined text-muted text-lg">monitor_heart</span>
+</div>
+<div class="flex items-baseline gap-2 relative z-10">
+<h3 class="text-[32px] font-bold text-text-main leading-tight font-display">98.2%</h3>
+<span class="text-sm font-medium text-accent bg-accent/10 px-1.5 py-0.5 rounded text-[12px]">-0.4%</span>
+</div>
+<svg class="absolute bottom-0 left-0 w-full h-16 opacity-30" preserveaspectratio="none" viewbox="0 0 100 30">
+<path class="sparkline-fill fill-success/20" d="M0,30 L0,5 Q10,10 20,5 T40,8 T60,5 T80,12 T100,8 L100,30 Z"></path>
+<path class="sparkline stroke-success" d="M0,5 Q10,10 20,5 T40,8 T60,5 T80,12 T100,8"></path>
+</svg>
+</div>
+<!-- Card 3 -->
+<div class="bg-white rounded-md border border-accent/30 p-5 shadow-float relative overflow-hidden ring-1 ring-inset ring-accent/10">
+<div class="flex justify-between items-start mb-2 relative z-10">
+<p class="text-sm font-medium text-muted">活跃严重告警</p>
+<span class="material-symbols-outlined text-accent text-lg">warning</span>
+</div>
+<div class="flex items-baseline gap-2 relative z-10">
+<h3 class="text-[32px] font-bold text-accent leading-tight font-display">3</h3>
+<span class="text-sm font-medium text-accent bg-accent/10 px-1.5 py-0.5 rounded text-[12px]">+2</span>
+</div>
+<svg class="absolute bottom-0 left-0 w-full h-16 opacity-30" preserveaspectratio="none" viewbox="0 0 100 30">
+<path class="sparkline-fill fill-accent/20" d="M0,30 L0,28 Q10,25 20,28 T40,26 T60,28 T80,10 T100,5 L100,30 Z"></path>
+<path class="sparkline stroke-accent" d="M0,28 Q10,25 20,28 T40,26 T60,28 T80,10 T100,5"></path>
+</svg>
+</div>
+<!-- Card 4 -->
+<div class="bg-white rounded-md border border-border-thin p-5 shadow-float relative overflow-hidden">
+<div class="flex justify-between items-start mb-2 relative z-10">
+<p class="text-sm font-medium text-muted">AI 平均分析时间</p>
+<span class="material-symbols-outlined text-muted text-lg">timer</span>
+</div>
+<div class="flex items-baseline gap-2 relative z-10">
+<h3 class="text-[32px] font-bold text-text-main leading-tight font-display">14m</h3>
+<span class="text-sm font-medium text-success bg-success/10 px-1.5 py-0.5 rounded text-[12px]">-2m</span>
+</div>
+<svg class="absolute bottom-0 left-0 w-full h-16 opacity-30" preserveaspectratio="none" viewbox="0 0 100 30">
+<path class="sparkline-fill fill-primary/20" d="M0,30 L0,25 Q10,22 20,26 T40,20 T60,15 T80,18 T100,10 L100,30 Z"></path>
+<path class="sparkline stroke-primary" d="M0,25 Q10,22 20,26 T40,20 T60,15 T80,18 T100,10"></path>
+</svg>
+</div>
+</div>
+<!-- Main Content Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-[400px]">
+<!-- Left Col: Main Chart (Span 2) -->
+<div class="lg:col-span-2 bg-white rounded-md border border-border-thin p-6 shadow-float flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<div>
+<h3 class="text-lg font-bold text-text-main">总异常量</h3>
+<p class="text-sm text-muted">累计异常检测统计</p>
+</div>
+<div class="flex gap-4 text-sm">
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-0.5 bg-primary rounded"></span>
+<span class="text-muted">累计异常</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-0.5 border-t border-dashed border-[#94a3b8]"></span>
+<span class="text-muted">历史平均</span>
+</div>
+<div class="flex items-center gap-1.5 ml-2">
+<select class="text-sm border-none bg-transparent focus:ring-0 text-text-main font-medium cursor-pointer pl-0 py-0">
+<option>过去 24 小时</option>
+<option>过去 7 天</option>
+</select>
+</div>
+</div>
+</div>
+<div class="flex-1 relative w-full h-full min-h-[300px]">
+<!-- Tooltip simulation -->
+<div class="absolute top-[20%] left-[65%] bg-white border border-border-thin shadow-float rounded p-2 z-20 pointer-events-none">
+<div class="text-[11px] text-muted mb-1">14:23 PM</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-accent"></span>
+<span class="text-sm font-bold text-text-main">12 次</span>
+<span class="text-xs text-accent">-42%</span>
+</div>
+</div>
+<!-- Chart graphic -->
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 800 300">
+<line stroke="#e2e8f0" stroke-width="1" x1="0" x2="800" y1="280" y2="280"></line>
+<path d="M0,150 Q100,140 200,160 T400,130 T600,150 T800,140" fill="none" stroke="#94a3b8" stroke-dasharray="4 4" stroke-width="2"></path>
+<path d="M0,145 Q100,135 200,155 T400,125 T480,140 Q500,250 520,260 Q540,240 560,160 T800,135" fill="none" stroke="#e11d48" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+<rect fill="#e11d48" height="280" opacity="0.05" width="60" x="490" y="0"></rect>
+<line opacity="0.5" stroke="#e11d48" stroke-dasharray="2 2" stroke-width="1" x1="520" x2="520" y1="0" y2="280"></line>
+<circle cx="520" cy="260" fill="#ffffff" r="4" stroke="#e11d48" stroke-width="2"></circle>
+<circle cx="520" cy="260" fill="#e11d48" opacity="0.2" r="12"></circle>
+<text fill="#64748b" font-family="Manrope" font-size="12" x="0" y="300">08:00</text>
+<text fill="#64748b" font-family="Manrope" font-size="12" text-anchor="middle" x="200" y="300">10:00</text>
+<text fill="#64748b" font-family="Manrope" font-size="12" text-anchor="middle" x="400" y="300">12:00</text>
+<text fill="#e11d48" font-family="Manrope" font-size="12" font-weight="bold" text-anchor="middle" x="520" y="300">14:23</text>
+<text fill="#64748b" font-family="Manrope" font-size="12" text-anchor="end" x="800" y="300">16:00</text>
+</svg>
+</div>
+</div>
+<!-- Right Col: Active Alerts -->
+<div class="bg-white rounded-md border border-border-thin shadow-float flex flex-col h-full overflow-hidden">
+<div class="px-5 py-4 border-b border-border-thin flex justify-between items-center bg-white sticky top-0 z-10">
+<div class="flex items-center gap-2">
+<h3 class="text-base font-bold text-text-main">活跃告警</h3>
+<span class="bg-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">3</span>
+</div>
+<button class="text-xs text-primary font-medium hover:underline">查看全部</button>
+</div>
+<div class="flex-1 overflow-y-auto p-2 space-y-1">
+<!-- Alert Item 1 -->
+<div class="p-3 rounded-md bg-[#f8fafc] border border-[#e2e8f0] cursor-pointer group relative overflow-hidden transition-all">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-accent"></div>
+<div class="flex justify-between items-start mb-1 pl-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-accent flex-shrink-0 animate-pulse"></span>
+<h4 class="text-sm font-bold text-text-main group-hover:text-primary transition-colors">API 延迟激增</h4>
+</div>
+<span class="text-xs text-muted whitespace-nowrap">2分钟前</span>
+</div>
+<p class="text-xs text-muted pl-6 line-clamp-2 leading-relaxed">支付网关 API 响应时间超过 2000ms 阈值。当前：4520ms。</p>
+<div class="mt-2 pl-6 flex gap-2">
+<span class="text-[10px] font-medium bg-white border border-border-thin px-2 py-0.5 rounded text-muted">美东集群</span>
+<span class="text-[10px] font-medium bg-white border border-border-thin px-2 py-0.5 rounded text-muted">严重</span>
+</div>
+</div>
+<!-- Alert Item 2 -->
+<div class="p-3 rounded-md hover:bg-[#f8fafc] cursor-pointer group transition-all border border-transparent hover:border-[#e2e8f0]">
+<div class="flex justify-between items-start mb-1 pl-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-accent flex-shrink-0"></span>
+<h4 class="text-sm font-semibold text-text-main group-hover:text-primary transition-colors">数据库 CPU 使用率</h4>
+</div>
+<span class="text-xs text-muted whitespace-nowrap">15分钟前</span>
+</div>
+<p class="text-xs text-muted pl-6 line-clamp-2 leading-relaxed">主数据库集群 CPU 使用率持续 10 分钟稳定在 95%。</p>
+</div>
+<!-- Alert Item 3 -->
+<div class="p-3 rounded-md hover:bg-[#f8fafc] cursor-pointer group transition-all border border-transparent hover:border-[#e2e8f0]">
+<div class="flex justify-between items-start mb-1 pl-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-accent flex-shrink-0"></span>
+<h4 class="text-sm font-semibold text-text-main group-hover:text-primary transition-colors">登录失败异常</h4>
+</div>
+<span class="text-xs text-muted whitespace-nowrap">42分钟前</span>
+</div>
+<p class="text-xs text-muted pl-6 line-clamp-2 leading-relaxed">认证服务 401 未授权响应出现激增。</p>
+</div>
+<!-- Acknowledged Alert -->
+<div class="p-3 rounded-md hover:bg-[#f8fafc] cursor-pointer group transition-all border border-transparent hover:border-[#e2e8f0] opacity-60">
+<div class="flex justify-between items-start mb-1 pl-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-muted flex-shrink-0"></span>
+<h4 class="text-sm font-semibold text-text-main line-through">队列积压</h4>
+</div>
+<span class="text-xs text-muted whitespace-nowrap">1小时前</span>
+</div>
+<p class="text-xs text-muted pl-6 line-clamp-1">已由 admin@cleanops.io 确认</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,55 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: platform-server
+  datasource:
+    url: jdbc:h2:mem:platformdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: 
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+ai:
+  deepseek:
+    api-key: ${DEEPSEEK_API_KEY:}
+    base-url: https://api.deepseek.com/v1
+    model: deepseek-chat
+    timeout: 30000
+
+platform:
+  auth:
+    token-secret: ${PLATFORM_TOKEN_SECRET:zero-intrusion-local-secret-change-me}
+    token-ttl-minutes: ${PLATFORM_TOKEN_TTL_MINUTES:480}
+    agent-api-key: ${PLATFORM_AGENT_API_KEY:local-agent-key}
+    users:
+      - username: ${PLATFORM_ADMIN_USERNAME:admin}
+        password: ${PLATFORM_ADMIN_PASSWORD:Admin@123}
+        display-name: 管理员
+        role: ADMIN
+      - username: ${PLATFORM_OPERATOR_USERNAME:operator}
+        password: ${PLATFORM_OPERATOR_PASSWORD:Operator@123}
+        display-name: 运维工程师
+        role: OPERATOR
+      - username: ${PLATFORM_VIEWER_USERNAME:viewer}
+        password: ${PLATFORM_VIEWER_PASSWORD:Viewer@123}
+        display-name: 观察员
+        role: VIEWER
