@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#002020",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#001c3a",
+                        "surface-container-low": "#f6f3f2",
+                        "inverse-primary": "#a5c8ff",
+                        "tertiary-fixed": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#303030",
+                        "inverse-on-surface": "#f3f0f0",
+                        "on-tertiary-container": "#fffbff",
+                        "secondary-fixed": "#68f7f7",
+                        "surface-variant": "#e4e2e1",
+                        "secondary-fixed-dim": "#44dada",
+                        "tertiary": "#bb0018",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#006a6a",
+                        "on-primary-container": "#fefcff",
+                        "on-background": "#1b1c1c",
+                        "on-error": "#ffffff",
+                        "outline": "#707785",
+                        "surface-tint": "#1677ff",
+                        "primary": "#1677ff",
+                        "secondary-container": "#65f4f4",
+                        "on-tertiary-fixed": "#410003",
+                        "tertiary-fixed-dim": "#ffb3ad",
+                        "on-surface": "#1b1c1c",
+                        "primary-fixed": "#d4e3ff",
+                        "on-secondary-container": "#006e6e",
+                        "tertiary-container": "#ff4d4f",
+                        "primary-fixed-dim": "#a5c8ff",
+                        "outline-variant": "#c0c7d6",
+                        "surface-container-high": "#eae7e7",
+                        "on-secondary-fixed-variant": "#004f50",
+                        "surface-bright": "#fcf9f8",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#930010",
+                        "on-surface-variant": "#404753",
+                        "primary-container": "#e6f4ff",
+                        "surface-container": "#f0eded",
+                        "surface-container-highest": "#e4e2e1",
+                        "surface-dim": "#dcd9d9",
+                        "on-primary-fixed-variant": "#004785",
+                        "surface": "#fcf9f8",
+                        "on-tertiary": "#ffffff",
+                        "background": "#f5f5f5",
+                        "on-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "4px",
+                        "lg": "6px",
+                        "xl": "8px",
+                        "full": "12px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter", "PingFang SC", "Microsoft YaHei", "sans-serif"],
+                        "body": ["Inter", "PingFang SC", "Microsoft YaHei", "sans-serif"],
+                        "label": ["Inter", "PingFang SC", "Microsoft YaHei", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif; background-color: #f5f5f5; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .ant-shadow { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-on-surface">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-screen flex flex-col bg-white border-r border-stone-200 w-64 z-50">
+<div class="px-6 py-6 border-b border-stone-100 mb-2">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-xl" data-icon="monitoring">monitoring</span>
+</div>
+<div>
+<h1 class="text-base font-bold text-stone-900 leading-tight">异常监控平台</h1>
+<p class="text-[0.625rem] font-bold uppercase tracking-wider text-stone-400">Monitoring Suite</p>
+</div>
+</div>
+</div>
+<div class="flex-1 px-3 space-y-1">
+<!-- Active: 总览仪表盘 -->
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-md text-primary font-medium bg-primary-container transition-colors" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="dashboard">dashboard</span>
+<span class="text-sm">总览仪表盘</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-md text-stone-600 font-medium hover:bg-stone-50 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="list_alt">list_alt</span>
+<span class="text-sm">异常列表</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-md text-stone-600 font-medium hover:bg-stone-50 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="analytics">analytics</span>
+<span class="text-sm">分析报告</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-md text-stone-600 font-medium hover:bg-stone-50 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="settings_suggest">settings_suggest</span>
+<span class="text-sm">规则配置</span>
+</a>
+</div>
+<div class="p-4 border-t border-stone-100">
+<div class="flex items-center gap-3 p-2 rounded-lg hover:bg-stone-50 transition-colors cursor-pointer">
+<img alt="用户头像" class="w-8 h-8 rounded-full bg-stone-100 border border-stone-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBg6CHG46y8BruDWZwt0b4uA7CQYNw5LymVw8NnCmbIJsy-FJUawSmi0899Gk1y4oFdHi50NOOxTe23Klqt6UTdAQTfxB_rBoWt4RKxWNt6gt_xVo5DauYUZkIarD2gx2IS1LLcv4PrV2EeAtYvqDOoGy2lr7o0j63zJCC869Pg9xi106vsiGzLZiO9gZY7KWYRPQKN1kZDKAqwE7GFFjKkpWdWvZsmyjZUyIhk7TeCgxykP8jljtNCjr-fC6QQfdkzmQjWwFPABAuP"/>
+<div class="flex-1 overflow-hidden">
+<p class="text-xs font-semibold truncate text-stone-800">管理员用户</p>
+<p class="text-[0.625rem] text-stone-400 truncate">系统总监</p>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="ml-64 min-h-screen">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-40 flex justify-between items-center w-full px-8 py-3 bg-white border-b border-stone-200 ant-shadow">
+<div class="flex items-center flex-1">
+<div class="relative w-full max-w-sm">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-lg" data-icon="search">search</span>
+<input class="w-full bg-stone-50 border border-stone-200 rounded py-1.5 pl-10 pr-4 text-xs focus:ring-1 focus:ring-primary focus:border-primary placeholder:text-stone-400 transition-all" placeholder="搜索异常 ID, 应用或关键词..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-5">
+<button class="text-stone-500 hover:text-primary transition-all relative">
+<span class="material-symbols-outlined text-xl" data-icon="notifications">notifications</span>
+<span class="absolute top-0 right-0 w-1.5 h-1.5 bg-red-500 rounded-full border border-white"></span>
+</button>
+<button class="text-stone-500 hover:text-primary transition-all">
+<span class="material-symbols-outlined text-xl" data-icon="help_outline">help_outline</span>
+</button>
+<div class="h-4 w-[1px] bg-stone-200"></div>
+<div class="flex items-center gap-2.5">
+<span class="text-[0.625rem] font-bold text-stone-400 uppercase tracking-tight">系统健康度</span>
+<div class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]"></div>
+</div>
+</div>
+</header>
+<div class="p-8 max-w-[1440px] mx-auto">
+<!-- Header Section -->
+<div class="mb-8 flex justify-between items-end">
+<div>
+<h2 class="text-2xl font-bold tracking-tight text-stone-900">异常概览</h2>
+<p class="text-stone-500 text-sm mt-1">实时监控系统健康状况与 AI 诊断反馈</p>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-1.5 bg-white text-stone-600 border border-stone-200 rounded text-sm font-medium hover:border-primary hover:text-primary transition-all ant-shadow">
+                        导出报告
+                    </button>
+<button class="px-4 py-1.5 bg-primary text-white rounded text-sm font-medium hover:bg-blue-600 transition-all ant-shadow flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="refresh">refresh</span>
+                        立即刷新
+                    </button>
+</div>
+</div>
+<!-- 4 Summary Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+<!-- Total Anomalies -->
+<div class="bg-white p-5 rounded border border-stone-200 ant-shadow group hover:border-primary/30 transition-all">
+<div class="flex justify-between items-start mb-3">
+<span class="text-xs font-medium text-stone-500">总异常量 (24h)</span>
+<div class="text-primary opacity-60">
+<span class="material-symbols-outlined text-xl" data-icon="error_outline">error_outline</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-bold text-stone-900">1,284</span>
+<span class="flex items-center text-red-500 text-[0.625rem] font-bold">
+<span class="material-symbols-outlined text-[10px]" data-icon="trending_up">trending_up</span>
+                            +12.5%
+                        </span>
+</div>
+</div>
+<!-- AI Accuracy -->
+<div class="bg-white p-5 rounded border border-stone-200 ant-shadow group hover:border-primary/30 transition-all">
+<div class="flex justify-between items-start mb-3">
+<span class="text-xs font-medium text-stone-500">AI 分析准确率</span>
+<div class="text-green-500 opacity-60">
+<span class="material-symbols-outlined text-xl" data-icon="auto_awesome">auto_awesome</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-bold text-stone-900">98.2%</span>
+<span class="text-green-500 text-[0.625rem] font-bold">优于平均</span>
+</div>
+</div>
+<!-- Critical Anomalies -->
+<div class="bg-red-50 p-5 rounded border border-red-100 ant-shadow group hover:bg-red-100 transition-all">
+<div class="flex justify-between items-start mb-3">
+<span class="text-xs font-medium text-red-700">待办严重告警</span>
+<div class="text-red-600">
+<span class="material-symbols-outlined text-xl" data-icon="priority_high">priority_high</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-bold text-red-700">24</span>
+<span class="text-red-600/70 text-[0.625rem] font-medium">需要立即处理</span>
+</div>
+</div>
+<!-- AI Analysis Time -->
+<div class="bg-white p-5 rounded border border-stone-200 ant-shadow group hover:border-primary/30 transition-all">
+<div class="flex justify-between items-start mb-3">
+<span class="text-xs font-medium text-stone-500">AI 平均分析时间</span>
+<div class="text-stone-400">
+<span class="material-symbols-outlined text-xl" data-icon="timer">timer</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-bold text-stone-900">1.2s</span>
+<span class="text-stone-400 text-[0.625rem] font-medium">实时并发</span>
+</div>
+</div>
+</div>
+<!-- Charts and Sidebar Grid -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Trend Chart - 8 Cols -->
+<div class="col-span-12 lg:col-span-8 space-y-6">
+<div class="bg-white p-6 rounded border border-stone-200 ant-shadow">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-sm font-bold text-stone-800">异常发生趋势</h3>
+<div class="flex bg-stone-50 p-0.5 rounded border border-stone-200">
+<button class="px-3 py-1 text-[10px] font-bold rounded bg-white ant-shadow text-primary">实时</button>
+<button class="px-3 py-1 text-[10px] font-medium text-stone-500 hover:text-stone-800">12小时</button>
+<button class="px-3 py-1 text-[10px] font-medium text-stone-500 hover:text-stone-800">24小时</button>
+</div>
+</div>
+<div class="h-60 w-full relative">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 100 100">
+<line stroke="#f0f0f0" stroke-width="0.5" x1="0" x2="100" y1="25" y2="25"></line>
+<line stroke="#f0f0f0" stroke-width="0.5" x1="0" x2="100" y1="50" y2="50"></line>
+<line stroke="#f0f0f0" stroke-width="0.5" x1="0" x2="100" y1="75" y2="75"></line>
+<path d="M0 80 Q 10 70, 20 75 T 40 60 T 60 70 T 80 30 T 100 50" fill="none" stroke="#1677ff" stroke-width="1.5"></path>
+<circle cx="80" cy="30" fill="#ff4d4f" r="1.5"></circle>
+<circle cx="40" cy="60" fill="#ff4d4f" r="1.2"></circle>
+</svg>
+<div class="mt-4 flex justify-between text-[10px] font-medium text-stone-400">
+<span>08:00</span>
+<span>10:00</span>
+<span>12:00</span>
+<span>14:00</span>
+<span>16:00</span>
+<span>18:00</span>
+<span>现在</span>
+</div>
+</div>
+<div class="mt-6 flex gap-4">
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="text-[10px] text-stone-500 font-medium">正常流量</span>
+</div>
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 rounded-full bg-red-500"></div>
+<span class="text-[10px] text-stone-500 font-medium">异常突增点</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-6">
+<div class="bg-white p-5 rounded border border-stone-200 ant-shadow">
+<h4 class="text-xs font-bold text-stone-800 mb-4">异常分布 (按模块)</h4>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between text-[10px] mb-1.5 font-medium text-stone-600">
+<span>用户认证服务</span>
+<span>42%</span>
+</div>
+<div class="h-1.5 bg-stone-100 rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 42%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-[10px] mb-1.5 font-medium text-stone-600">
+<span>支付网关</span>
+<span>28%</span>
+</div>
+<div class="h-1.5 bg-stone-100 rounded-full overflow-hidden">
+<div class="h-full bg-cyan-500" style="width: 28%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-[10px] mb-1.5 font-medium text-stone-600">
+<span>订单系统</span>
+<span>15%</span>
+</div>
+<div class="h-1.5 bg-stone-100 rounded-full overflow-hidden">
+<div class="h-full bg-stone-400" style="width: 15%"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="relative rounded border border-stone-200 overflow-hidden group ant-shadow">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="abstract digital data visualization" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhbSxlXglVKiJDYTV20pOzs_efDbRol7BbQ4G3IjmbJSVqx9mrzi4BLIAJ3TRw0hdLAN2YdFxCOwA9N3yPnRpiD8WIBU53-VLGcvvzRBsB2K4jajdjTpv4gocOuFT6pnw0fQIPtyuL8dMgEC8Go49ip6ErPMO-TaJ-ypgyypmc3dFjHbvmyNvXyn6B02-GgoIeapf3jAubjVinEDE9qQVAxF9JFTjBkhENDY7Ig7ev4K_mQAPkdP-8qSUS9BdGWrNVgo9lixMC3g2x"/>
+<div class="absolute inset-0 bg-gradient-to-t from-stone-900/90 via-stone-900/30 to-transparent flex flex-col justify-end p-5">
+<div class="flex items-center gap-2 mb-1.5">
+<span class="material-symbols-outlined text-blue-400 text-sm" data-icon="auto_awesome">auto_awesome</span>
+<p class="text-white text-xs font-bold">AI 诊断建议</p>
+</div>
+<p class="text-white/80 text-[10px] leading-relaxed">检测到数据库连接池水位持续走高，建议增加连接数配置以应对当前流量波动。</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Active Alerts Sidebar - 4 Cols -->
+<aside class="col-span-12 lg:col-span-4">
+<div class="bg-white p-6 rounded border border-stone-200 ant-shadow h-full flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-sm font-bold text-stone-800">活动告警</h3>
+<span class="text-[10px] font-bold bg-red-100 text-red-600 px-2 py-0.5 rounded">3 个实时严重</span>
+</div>
+<div class="space-y-3 flex-1 overflow-y-auto no-scrollbar pr-1">
+<!-- Alert Item 1 -->
+<div class="p-4 rounded border border-stone-100 bg-stone-50 hover:bg-white hover:border-primary/20 transition-all cursor-pointer group">
+<div class="flex items-start gap-3">
+<div class="mt-1 w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_4px_rgba(239,68,68,0.5)]"></div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<p class="text-xs font-bold text-stone-800">Auth-Service Timeout</p>
+<span class="text-[9px] font-medium text-stone-400">2分钟前</span>
+</div>
+<p class="text-[10px] text-stone-500 mt-1.5 line-clamp-2">超过 15% 的登录请求响应时间 &gt; 3000ms。检测到 Redis 连接抖动。</p>
+<div class="mt-3 flex gap-1.5">
+<span class="text-[9px] px-1.5 py-0.5 bg-red-100 text-red-600 font-bold rounded">P0 严重</span>
+<span class="text-[9px] px-1.5 py-0.5 bg-stone-200 text-stone-600 font-bold rounded">待分析</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Alert Item 2 -->
+<div class="p-4 rounded border border-stone-100 bg-stone-50 hover:bg-white hover:border-primary/20 transition-all cursor-pointer group">
+<div class="flex items-start gap-3">
+<div class="mt-1 w-1.5 h-1.5 rounded-full bg-amber-500"></div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<p class="text-xs font-bold text-stone-800">Payment Gateway Error 5xx</p>
+<span class="text-[9px] font-medium text-stone-400">12分钟前</span>
+</div>
+<p class="text-[10px] text-stone-500 mt-1.5 line-clamp-2">支付通道 API 返回 502 Bad Gateway。影响范围：支付宝交易流水。</p>
+<div class="mt-3 flex gap-1.5">
+<span class="text-[9px] px-1.5 py-0.5 bg-amber-100 text-amber-700 font-bold rounded">P1 中等</span>
+<span class="text-[9px] px-1.5 py-0.5 bg-blue-100 text-blue-600 font-bold rounded">AI 已分析</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Alert Item 3 -->
+<div class="p-4 rounded border border-stone-100 bg-stone-50 hover:bg-white hover:border-primary/20 transition-all cursor-pointer group">
+<div class="flex items-start gap-3">
+<div class="mt-1 w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_4px_rgba(239,68,68,0.5)]"></div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<p class="text-xs font-bold text-stone-800">Storage Quota Alert</p>
+<span class="text-[9px] font-medium text-stone-400">45分钟前</span>
+</div>
+<p class="text-[10px] text-stone-500 mt-1.5 line-clamp-2">OSS 存储空间占用率已达 85%。触发预警。即将对旧日志进行自动归档。</p>
+<div class="mt-3 flex gap-1.5">
+<span class="text-[9px] px-1.5 py-0.5 bg-red-100 text-red-600 font-bold rounded">P0 严重</span>
+<span class="text-[9px] px-1.5 py-0.5 bg-green-100 text-green-600 font-bold rounded">自动处理中</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-6 border-t border-stone-100">
+<button class="w-full py-2 text-[11px] font-bold text-stone-500 border border-dashed border-stone-300 rounded hover:border-primary hover:text-primary transition-all mb-4">
+                                查看全部历史告警
+                            </button>
+<div class="p-4 rounded bg-blue-50/50 border border-blue-100">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="lightbulb" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+<span class="text-[10px] font-bold text-primary uppercase tracking-wider">系统自愈建议</span>
+</div>
+<p class="text-[10px] text-stone-600 leading-relaxed">
+                                    最近 1 小时的流量波峰显示，**User-API** 的副本数不足。建议开启弹性扩容策略。
+                                </p>
+<button class="mt-2 text-[10px] font-bold text-primary hover:underline">应用优化策略</button>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-6 right-6 w-12 h-12 bg-primary rounded-full shadow-lg flex items-center justify-center text-white hover:bg-blue-600 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined text-2xl" data-icon="add" style="font-variation-settings: 'wght' 500;">add</span>
+</button>
+</body></html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>规则配置 - Exception Platform</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#002020",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#001c3a",
+                        "surface-container-low": "#f6f3f2",
+                        "inverse-primary": "#a5c8ff",
+                        "tertiary-fixed": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#303030",
+                        "inverse-on-surface": "#f3f0f0",
+                        "on-tertiary-container": "#fffbff",
+                        "secondary-fixed": "#68f7f7",
+                        "surface-variant": "#e4e2e1",
+                        "secondary-fixed-dim": "#44dada",
+                        "tertiary": "#bb0018",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#006a6a",
+                        "on-primary-container": "#fefcff",
+                        "on-background": "#1b1c1c",
+                        "on-error": "#ffffff",
+                        "outline": "#707785",
+                        "surface-tint": "#005fae",
+                        "primary": "#005daa",
+                        "secondary-container": "#65f4f4",
+                        "on-tertiary-fixed": "#410003",
+                        "tertiary-fixed-dim": "#ffb3ad",
+                        "on-surface": "#1b1c1c",
+                        "primary-fixed": "#d4e3ff",
+                        "on-secondary-container": "#006e6e",
+                        "tertiary-container": "#e71325",
+                        "primary-fixed-dim": "#a5c8ff",
+                        "outline-variant": "#c0c7d6",
+                        "surface-container-high": "#eae7e7",
+                        "on-secondary-fixed-variant": "#004f50",
+                        "surface-bright": "#fcf9f8",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#930010",
+                        "on-surface-variant": "#404753",
+                        "primary-container": "#0075d5",
+                        "surface-container": "#f0eded",
+                        "surface-container-highest": "#e4e2e1",
+                        "surface-dim": "#dcd9d9",
+                        "on-primary-fixed-variant": "#004785",
+                        "surface": "#fcf9f8",
+                        "on-tertiary": "#ffffff",
+                        "background": "#fcf9f8",
+                        "on-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+            line-height: 1;
+        }
+        .form-input-minimalist {
+            background-color: transparent;
+            border-top: 0;
+            border-left: 0;
+            border-right: 0;
+            border-bottom: 2px solid #e4e2e1;
+            transition: all 0.3s ease;
+        }
+        .form-input-minimalist:focus {
+            border-color: #005daa;
+            background-color: #ffffff;
+            box-shadow: none;
+            outline: none;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface">
+<div class="flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col bg-stone-100 dark:bg-stone-900 w-64 border-r-0 z-50">
+<div class="px-6 py-8">
+<div class="flex items-center gap-3 mb-10">
+<div class="w-10 h-10 bg-primary-container flex items-center justify-center rounded-xl">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">monitoring</span>
+</div>
+<div>
+<h1 class="text-lg font-bold text-stone-900 dark:text-white leading-tight">Exception Platform</h1>
+<p class="text-[0.6875rem] font-bold uppercase tracking-wider text-stone-500">Monitoring Suite</p>
+</div>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl transition-colors hover:bg-stone-200 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400 font-medium" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm">总览仪表盘</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl transition-colors hover:bg-stone-200 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400 font-medium" href="#">
+<span class="material-symbols-outlined">list_alt</span>
+<span class="text-sm">异常列表</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl transition-colors hover:bg-stone-200 dark:hover:bg-stone-800 text-stone-500 dark:text-stone-400 font-medium" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-sm">分析报告</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-150 text-blue-600 dark:text-blue-400 font-bold border-r-2 border-blue-600 bg-stone-200/50 dark:bg-stone-800/50" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings_suggest</span>
+<span class="text-sm">规则配置</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto p-6">
+<div class="bg-surface-container-low rounded-2xl p-4 flex items-center gap-3">
+<img alt="User Avatar" class="w-8 h-8 rounded-full bg-surface-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmdQz2RRRlEgreDtUyXP79G-8HTeZiru0hfLM12NjoAzHOZqV1c4yKOX-WxI8RIIaQzUTE_Jvl0v6b-ufs42gBrRx1fHTtGsPC8259Q-SaCckUtw9hvJCJtx7KqCAH_dVkgsY35BcoBjizO-pD32c7DL8VYIPb0CbOQ8NqeleNJ3pbeZtulM6tERNwiaj8G6ehCTl7PBZyb14o0jL4nhaxv9dEW4kq_skUJd74ohUXuoKjddry9FCUrK0-exQvuq4FH6S5F91Wc1Xb"/>
+<div class="overflow-hidden">
+<p class="text-sm font-semibold truncate">管理员用户</p>
+<p class="text-xs text-outline truncate">admin@exception.io</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-64 p-12 bg-surface">
+<!-- Header Section -->
+<header class="mb-12 max-w-6xl">
+<span class="text-[0.6875rem] font-700 tracking-[0.15em] text-primary uppercase mb-2 block">系统配置</span>
+<h2 class="text-[1.75rem] font-600 tracking-[-0.02em] text-on-surface mb-4">规则配置</h2>
+<p class="text-body-md text-on-surface-variant leading-relaxed max-w-3xl">
+                    定义异常处理的智能层。调整检测参数、AI 处理模板和升级阈值，以优化您的监控流程。
+                </p>
+</header>
+<div class="max-w-6xl space-y-12">
+<!-- Section 1: Detection Logic -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+<div>
+<h3 class="text-title-sm font-600 mb-2">检测逻辑</h3>
+<p class="text-xs text-on-surface-variant opacity-70 leading-relaxed">定义技术栈检查的范围和深度。</p>
+</div>
+<div class="lg:col-span-2 bg-surface-container-lowest rounded-xl p-8 space-y-6">
+<div class="space-y-1">
+<label class="text-[0.6875rem] font-700 text-outline-variant uppercase">包名过滤器 (Package Name Filter)</label>
+<input class="w-full form-input-minimalist py-3 text-sm" placeholder="com.company.service.*" type="text"/>
+</div>
+<div class="flex items-center justify-between py-2">
+<div>
+<p class="text-sm font-medium">深度采样</p>
+<p class="text-xs text-outline">对递归调用启用详细的堆栈跟踪捕获</p>
+</div>
+<button class="w-12 h-6 bg-primary-container rounded-full relative flex items-center px-1">
+<div class="w-4 h-4 bg-white rounded-full ml-auto"></div>
+</button>
+</div>
+</div>
+</section>
+<!-- Section 2: AI Interface Config -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+<div>
+<h3 class="text-title-sm font-600 mb-2">AI 接口配置</h3>
+<p class="text-xs text-on-surface-variant opacity-70 leading-relaxed">配置用于自动根因分析的大语言模型。</p>
+</div>
+<div class="lg:col-span-2 bg-surface-container-lowest rounded-xl p-8 space-y-8">
+<div class="grid grid-cols-2 gap-8">
+<div class="space-y-1">
+<label class="text-[0.6875rem] font-700 text-outline-variant uppercase">模型选择</label>
+<select class="w-full form-input-minimalist py-3 text-sm appearance-none bg-none">
+<option>GPT-4o Professional</option>
+<option>Claude 3.5 Sonnet</option>
+<option>本地 Llama-3 (自托管)</option>
+</select>
+</div>
+<div class="space-y-1">
+<label class="text-[0.6875rem] font-700 text-outline-variant uppercase">API 密钥</label>
+<input class="w-full form-input-minimalist py-3 text-sm" type="password" value="••••••••••••••••"/>
+</div>
+</div>
+<div class="space-y-1">
+<label class="text-[0.6875rem] font-700 text-outline-variant uppercase">提示词模板</label>
+<textarea class="w-full form-input-minimalist py-3 text-sm resize-none" placeholder="解释以下堆栈跟踪并建议修复方案: {{stack_trace}}" rows="5"></textarea>
+<p class="text-[10px] text-primary pt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">info</span>
+                                支持 Handlebars 语法，如 {{stack_trace}}, {{context}}, 和 {{env}}。
+                            </p>
+</div>
+</div>
+</section>
+<!-- Section 3: Thresholds & Alerts -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+<div>
+<h3 class="text-title-sm font-600 mb-2">阈值与告警</h3>
+<p class="text-xs text-on-surface-variant opacity-70 leading-relaxed">控制噪音。设置频率限制和通知渠道。</p>
+</div>
+<div class="lg:col-span-2 bg-surface-container-lowest rounded-xl p-8 space-y-8">
+<div class="flex items-end gap-6">
+<div class="flex-1 space-y-1">
+<label class="text-[0.6875rem] font-700 text-outline-variant uppercase">告警频率</label>
+<div class="flex items-center gap-3">
+<input class="w-20 form-input-minimalist py-3 text-sm text-center" type="number" value="10"/>
+<span class="text-sm text-on-surface-variant">次发生 / 每</span>
+<select class="flex-1 form-input-minimalist py-3 text-sm">
+<option>1 分钟</option>
+<option>5 分钟</option>
+<option>1 小时</option>
+</select>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<label class="text-[0.6875rem] font-700 text-outline-variant uppercase">接收者</label>
+<div class="space-y-3">
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-[#5865F2] flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm">podcasts</span>
+</div>
+<div>
+<p class="text-sm font-medium">Discord Webhook</p>
+<p class="text-xs text-outline">#ops-alerts-critical</p>
+</div>
+</div>
+<button class="text-outline hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm">mail</span>
+</div>
+<div>
+<p class="text-sm font-medium">工程团队邮件组</p>
+<p class="text-xs text-outline">dev-oncall@company.com</p>
+</div>
+</div>
+<button class="text-outline hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+<button class="w-full py-3 border-2 border-dashed border-outline-variant rounded-xl text-xs font-bold uppercase tracking-wider text-outline-variant hover:border-primary hover:text-primary transition-all">
+                                    + 添加渠道
+                                </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer Actions -->
+<div class="pt-10 flex justify-end items-center gap-6 border-t border-surface-container">
+<button class="text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors px-6 py-3">放弃更改</button>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-10 py-3 rounded-lg font-semibold shadow-lg shadow-primary/10 transition-all hover:scale-[1.02] active:scale-95">
+                        保存配置
+                    </button>
+</div>
+</div>
+<!-- Contextual Helper Card -->
+<div class="fixed right-8 bottom-8 w-72 bg-white/80 backdrop-blur-xl p-6 rounded-2xl shadow-2xl border border-white/20 hidden xl:block">
+<div class="flex items-center gap-2 text-primary mb-3">
+<span class="material-symbols-outlined">lightbulb</span>
+<span class="text-xs font-bold uppercase">配置建议</span>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed mb-4">
+                    对 <b>AI 接口配置</b> 的更改将立即应用于所有传入的异常。我们建议在提交前在沙盒模式下测试您的模板。
+                </p>
+<a class="text-[10px] font-bold text-primary underline underline-offset-4" href="#">打开沙盒模式</a>
+</div>
+</main>
+</div>
+</body></html>
