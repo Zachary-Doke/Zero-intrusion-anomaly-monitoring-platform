@@ -13,10 +13,11 @@ public class RuleSettingsDto {
     private Double defaultSampleRate;
     private Integer queueCapacity;
     private Integer flushIntervalMs;
-    private Integer thresholdCount;
-    private Integer thresholdWindowMinutes;
-    private String alertRecipients;
+    private String aiBaseUrl;
+    private String aiApiKey;
+    private Boolean aiApiKeyConfigured;
     private String aiModel;
+    private String aiPromptTemplate;
     private String traceKeys;
     private String sensitiveFields;
     private Long version;

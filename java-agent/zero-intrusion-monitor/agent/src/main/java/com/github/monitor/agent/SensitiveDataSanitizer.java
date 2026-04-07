@@ -17,7 +17,7 @@ public final class SensitiveDataSanitizer {
 
     private static final String MASK = "***";
     private static final String[] DEFAULT_KEYS = new String[] {
-            "password", "passwd", "pwd", "token", "secret", "credential", "authorization"
+            "password", "passwd", "pwd", "token", "secret", "credential", "authorization", "sensitive"
     };
     private static final Pattern BEARER_PATTERN = Pattern.compile("(?i)(bearer\\s+)([A-Za-z0-9._\\-]+)");
 

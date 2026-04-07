@@ -58,6 +58,15 @@ class ApiSecurityIntegrationTest {
     }
 
     @Test
+    void shouldNotExposeAiApiKeyInSettingsResponse() throws Exception {
+        mockMvc.perform(get("/api/settings")
+                        .header("Authorization", bearer(UserRole.ADMIN)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.aiApiKey").value(""))
+                .andExpect(jsonPath("$.data.aiApiKeyConfigured").isBoolean());
+    }
+
+    @Test
     void shouldRequireAgentKeyForEventIngestion() throws Exception {
         mockMvc.perform(post("/api/events")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -74,6 +83,14 @@ class ApiSecurityIntegrationTest {
                         .content(objectMapper.writeValueAsString(buildEvent())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
+    }
+
+    @Test
+    void shouldRequireOperatorForSuggestionEndpoint() throws Exception {
+        mockMvc.perform(post("/api/exceptions/1/suggestion")
+                        .header("Authorization", bearer(UserRole.VIEWER)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
     }
 
     private ExceptionEventReq buildEvent() {

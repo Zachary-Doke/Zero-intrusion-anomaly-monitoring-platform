@@ -50,10 +50,10 @@ class RuleSettingsServiceTest {
         updated.setDefaultSampleRate(current.getDefaultSampleRate());
         updated.setQueueCapacity(current.getQueueCapacity());
         updated.setFlushIntervalMs(current.getFlushIntervalMs());
-        updated.setThresholdCount(current.getThresholdCount() + 1);
-        updated.setThresholdWindowMinutes(current.getThresholdWindowMinutes());
-        updated.setAlertRecipients(current.getAlertRecipients());
+        updated.setAiBaseUrl(current.getAiBaseUrl());
+        updated.setAiApiKey(current.getAiApiKey());
         updated.setAiModel(current.getAiModel());
+        updated.setAiPromptTemplate(current.getAiPromptTemplate() + "\n# adjusted");
         updated.setTraceKeys(current.getTraceKeys());
         updated.setSensitiveFields(current.getSensitiveFields());
 
@@ -67,5 +67,45 @@ class RuleSettingsServiceTest {
         assertThat(agentSyncStatusService.countEffective(saved.getVersion())).isEqualTo(1);
         assertThat(agentSyncStatusService.listStatuses()).hasSizeGreaterThanOrEqualTo(1);
         assertThat(agentSyncStatusService.listStatuses().get(0).isEffective()).isTrue();
+    }
+
+    @Test
+    void shouldHideStoredAiApiKeyAndPreserveItOnBlankSave() {
+        RuleSettingsDto current = ruleSettingsService.getSettings();
+
+        RuleSettingsDto updated = copyOf(current);
+        updated.setAiApiKey("secret-for-test");
+
+        RuleSettingsDto saved = ruleSettingsService.save(updated);
+        assertThat(saved.getAiApiKey()).isEmpty();
+        assertThat(saved.getAiApiKeyConfigured()).isTrue();
+
+        RuleSettingsDto blankUpdate = copyOf(saved);
+        blankUpdate.setAiApiKey("");
+
+        RuleSettingsDto savedAgain = ruleSettingsService.save(blankUpdate);
+        assertThat(savedAgain.getAiApiKey()).isEmpty();
+        assertThat(savedAgain.getAiApiKeyConfigured()).isTrue();
+    }
+
+    private RuleSettingsDto copyOf(RuleSettingsDto source) {
+        RuleSettingsDto copy = new RuleSettingsDto();
+        copy.setPackagePatterns(source.getPackagePatterns());
+        copy.setDeepSamplingEnabled(source.getDeepSamplingEnabled());
+        copy.setDepthLimit(source.getDepthLimit());
+        copy.setLengthLimit(source.getLengthLimit());
+        copy.setCollectionLimit(source.getCollectionLimit());
+        copy.setDefaultSampleRate(source.getDefaultSampleRate());
+        copy.setQueueCapacity(source.getQueueCapacity());
+        copy.setFlushIntervalMs(source.getFlushIntervalMs());
+        copy.setAiBaseUrl(source.getAiBaseUrl());
+        copy.setAiApiKey(source.getAiApiKey());
+        copy.setAiApiKeyConfigured(source.getAiApiKeyConfigured());
+        copy.setAiModel(source.getAiModel());
+        copy.setAiPromptTemplate(source.getAiPromptTemplate());
+        copy.setTraceKeys(source.getTraceKeys());
+        copy.setSensitiveFields(source.getSensitiveFields());
+        copy.setVersion(source.getVersion());
+        return copy;
     }
 }

@@ -53,3 +53,6 @@ platform:
         password: ${PLATFORM_VIEWER_PASSWORD:Viewer@123}
         display-name: 观察员
         role: VIEWER
+  demo:
+    seed-data:
+      enabled: false

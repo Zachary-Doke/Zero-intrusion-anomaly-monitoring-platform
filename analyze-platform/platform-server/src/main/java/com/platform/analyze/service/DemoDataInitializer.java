@@ -1,6 +1,7 @@
 package com.platform.analyze.service;
 
 import com.platform.analyze.dto.ExceptionEventReq;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@ConditionalOnProperty(prefix = "platform.demo.seed-data", name = "enabled", havingValue = "true")
 public class DemoDataInitializer implements ApplicationRunner {
 
     private final ExceptionService exceptionService;
