@@ -6,6 +6,7 @@
 *.iml
 
 **/target/
+**/out/
 **/dist/
 **/.vite/
 **/dependency-reduced-pom.xml
