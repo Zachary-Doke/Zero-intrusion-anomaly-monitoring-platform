@@ -50,7 +50,7 @@ export function SettingsPage() {
     try {
       const saved = await api.saveSettings(settings);
       setSettings(saved);
-      setMessage("配置已保存，Agent 将在下一次拉取时生效。");
+      setMessage("配置已保存，采集端将在下一次拉取时生效。");
       const latestStatuses = await api.getAgentSyncStatuses();
       setStatuses(latestStatuses || []);
     } catch (submitError) {
@@ -64,8 +64,8 @@ export function SettingsPage() {
     <div className="page-stack">
       <header className="page-header">
         <div>
-          <span className="label-overline">Configuration</span>
-          <h2>采集规则与 AI 接口</h2>
+          <span className="label-overline">配置中心</span>
+          <h2>采集规则与智能分析接口</h2>
           <p>删掉阈值告警和报告中心后，配置页只保留当前主线真正需要的参数。</p>
         </div>
       </header>
@@ -78,8 +78,8 @@ export function SettingsPage() {
         <form className="page-stack" onSubmit={handleSubmit}>
           <section className="settings-grid">
             <div>
-              <span className="label-overline">Agent Capture</span>
-              <h3>Agent 捕获规则</h3>
+              <span className="label-overline">采集规则</span>
+              <h3>采集端捕获规则</h3>
               <p className="section-copy">远程配置为主，本地参数只保留接入兜底。这里控制包名、采样和快照深度。</p>
             </div>
             <div className="surface-panel form-panel">
@@ -88,7 +88,7 @@ export function SettingsPage() {
                 <input
                   value={settings.packagePatterns || ""}
                   onChange={(event) => updateField("packagePatterns", event.target.value)}
-                  placeholder="com.company.service,com.company.api"
+                  placeholder="请输入包名前缀，多个用逗号分隔"
                 />
               </label>
 
@@ -106,7 +106,7 @@ export function SettingsPage() {
 
               <div className="form-grid">
                 <label className="field">
-                  <span>depthLimit</span>
+                  <span>快照深度限制</span>
                   <input
                     type="number"
                     value={settings.depthLimit ?? ""}
@@ -114,7 +114,7 @@ export function SettingsPage() {
                   />
                 </label>
                 <label className="field">
-                  <span>lengthLimit</span>
+                  <span>文本长度限制</span>
                   <input
                     type="number"
                     value={settings.lengthLimit ?? ""}
@@ -122,7 +122,7 @@ export function SettingsPage() {
                   />
                 </label>
                 <label className="field">
-                  <span>collectionLimit</span>
+                  <span>集合数量限制</span>
                   <input
                     type="number"
                     value={settings.collectionLimit ?? ""}
@@ -130,7 +130,7 @@ export function SettingsPage() {
                   />
                 </label>
                 <label className="field">
-                  <span>defaultSampleRate</span>
+                  <span>默认采样率</span>
                   <input
                     type="number"
                     step="0.1"
@@ -139,7 +139,7 @@ export function SettingsPage() {
                   />
                 </label>
                 <label className="field">
-                  <span>queueCapacity</span>
+                  <span>队列容量</span>
                   <input
                     type="number"
                     value={settings.queueCapacity ?? ""}
@@ -147,7 +147,7 @@ export function SettingsPage() {
                   />
                 </label>
                 <label className="field">
-                  <span>flushIntervalMs</span>
+                  <span>刷新间隔（毫秒）</span>
                   <input
                     type="number"
                     value={settings.flushIntervalMs ?? ""}
@@ -160,14 +160,14 @@ export function SettingsPage() {
 
           <section className="settings-grid">
             <div>
-              <span className="label-overline">AI Config</span>
-              <h3>AI 接口配置</h3>
+              <span className="label-overline">智能分析</span>
+              <h3>智能分析接口配置</h3>
               <p className="section-copy">异常详情页会读取这里的接口配置，直接在详情内生成处理建议，不再进入独立报告中心。</p>
             </div>
             <div className="surface-panel form-panel">
               <div className="form-grid">
                 <label className="field">
-                  <span>AI Base URL</span>
+                  <span>接口地址</span>
                   <input
                     value={settings.aiBaseUrl || ""}
                     onChange={(event) => updateField("aiBaseUrl", event.target.value)}
@@ -175,7 +175,7 @@ export function SettingsPage() {
                   />
                 </label>
                 <label className="field">
-                  <span>AI Model</span>
+                  <span>模型名称</span>
                   <input
                     value={settings.aiModel || ""}
                     onChange={(event) => updateField("aiModel", event.target.value)}
@@ -185,7 +185,7 @@ export function SettingsPage() {
               </div>
 
               <label className="field">
-                <span>API Key</span>
+                <span>接口密钥</span>
                 <input
                   type="password"
                   value={settings.aiApiKey || ""}
@@ -208,8 +208,8 @@ export function SettingsPage() {
 
           <section className="settings-grid">
             <div>
-              <span className="label-overline">Sync Status</span>
-              <h3>Agent 生效状态</h3>
+              <span className="label-overline">同步状态</span>
+              <h3>采集端生效状态</h3>
               <p className="section-copy">只保留配置是否被服务成功拉取并生效的最小状态面，不再展示运维级追踪细节。</p>
             </div>
             <div className="status-board">
@@ -240,7 +240,7 @@ export function SettingsPage() {
                   </article>
                 ))
               ) : (
-                <div className="empty-state">暂无 Agent 同步记录</div>
+                <div className="empty-state">暂无采集端同步记录</div>
               )}
             </div>
           </section>

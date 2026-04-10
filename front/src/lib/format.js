@@ -49,9 +49,25 @@ export function severityVariant(value) {
     case "HIGH":
       return "pill--high";
     case "MEDIUM":
+    case "LOW":
       return "pill--medium";
     default:
       return "pill--neutral";
+  }
+}
+
+export function severityLabel(value) {
+  switch ((value || "").toUpperCase()) {
+    case "CRITICAL":
+      return "严重";
+    case "HIGH":
+      return "高";
+    case "MEDIUM":
+      return "中";
+    case "LOW":
+      return "低";
+    default:
+      return value || "--";
   }
 }
 
@@ -76,6 +92,22 @@ export function statusLabel(value) {
       return "处理中";
     case "RESOLVED":
       return "已解决";
+    default:
+      return value || "--";
+  }
+}
+
+export function suggestionStatusLabel(value) {
+  switch ((value || "").toUpperCase()) {
+    case "READY":
+      return "就绪";
+    case "GENERATING":
+      return "生成中";
+    case "FAILED":
+      return "生成失败";
+    case "SUCCESS":
+    case "COMPLETED":
+      return "已生成";
     default:
       return value || "--";
   }

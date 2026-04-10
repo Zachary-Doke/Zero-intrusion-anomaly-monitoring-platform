@@ -1,7 +1,7 @@
-import { severityVariant, statusLabel, statusVariant } from "../lib/format";
+import { severityLabel, severityVariant, statusLabel, statusVariant } from "../lib/format";
 
 export function SeverityPill({ value }) {
-  return <span className={`pill ${severityVariant(value)}`}>{value || "--"}</span>;
+  return <span className={`pill ${severityVariant(value)}`}>{severityLabel(value)}</span>;
 }
 
 export function StatusPill({ value }) {

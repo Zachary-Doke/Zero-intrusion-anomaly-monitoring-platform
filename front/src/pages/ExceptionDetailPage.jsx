@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api } from "../lib/api";
-import { formatDateTime, formatFullDateTime, formatJsonText, safeArray } from "../lib/format";
+import { formatDateTime, formatFullDateTime, formatJsonText, safeArray, statusLabel, suggestionStatusLabel } from "../lib/format";
 import { SeverityPill, StatusPill } from "../components/StatusPill";
 
 const STATUS_OPTIONS = ["OPEN", "INVESTIGATING", "RESOLVED"];
@@ -74,7 +74,7 @@ export function ExceptionDetailPage() {
             <span className="material-symbols-outlined">arrow_back</span>
             返回异常列表
           </Link>
-          <span className="label-overline">Exception Detail</span>
+          <span className="label-overline">异常详情</span>
           <h2>{detail?.summary || detail?.exceptionClass || "异常详情"}</h2>
           <p>{detail?.topStackFrame || "查看完整上下文、根因分析和处理建议"}</p>
         </div>
@@ -93,15 +93,15 @@ export function ExceptionDetailPage() {
             <section className="suggestion-card">
               <div className="panel-head">
                 <div>
-                  <span className="label-overline">Root Cause</span>
+                  <span className="label-overline">根因分析</span>
                   <h3>异常原因分析</h3>
                 </div>
-                <span className="panel-footnote">状态：{detail.suggestion?.suggestionStatus || "READY"}</span>
+                <span className="panel-footnote">状态：{suggestionStatusLabel(detail.suggestion?.suggestionStatus || "READY")}</span>
               </div>
               <p className="analysis-copy">{detail.suggestion?.rootCauseAnalysis || "暂无根因分析。"}</p>
               {detail.suggestion?.impactScope ? (
                 <div className="surface-subpanel">
-                  <span className="label-overline">Impact Scope</span>
+                  <span className="label-overline">影响范围</span>
                   <p>{detail.suggestion.impactScope}</p>
                 </div>
               ) : null}
@@ -110,7 +110,7 @@ export function ExceptionDetailPage() {
             <section className="surface-panel">
               <div className="panel-head">
                 <div>
-                  <span className="label-overline">Fix Suggestion</span>
+                  <span className="label-overline">处理建议</span>
                   <h3>处理建议</h3>
                 </div>
                 <button
@@ -140,7 +140,7 @@ export function ExceptionDetailPage() {
             <section className="surface-panel">
               <div className="panel-head">
                 <div>
-                  <span className="label-overline">Stack Trace</span>
+                  <span className="label-overline">堆栈信息</span>
                   <h3>堆栈与消息</h3>
                 </div>
               </div>
@@ -152,21 +152,21 @@ export function ExceptionDetailPage() {
             <section className="surface-panel">
               <div className="panel-head">
                 <div>
-                  <span className="label-overline">Context</span>
+                  <span className="label-overline">上下文</span>
                   <h3>上下文快照</h3>
                 </div>
               </div>
               <div className="context-grid">
                 <div className="surface-subpanel">
-                  <span className="label-overline">Arguments Snapshot</span>
+                  <span className="label-overline">参数快照</span>
                   <pre className="json-block">{formatJsonText(detail.argumentsSnapshot)}</pre>
                 </div>
                 <div className="surface-subpanel">
-                  <span className="label-overline">This Snapshot</span>
+                  <span className="label-overline">对象快照</span>
                   <pre className="json-block">{formatJsonText(detail.thisSnapshot)}</pre>
                 </div>
                 <div className="surface-subpanel surface-subpanel--wide">
-                  <span className="label-overline">Trace Context</span>
+                  <span className="label-overline">追踪上下文</span>
                   <pre className="json-block">{formatJsonText(detail.traceContext)}</pre>
                 </div>
               </div>
@@ -177,12 +177,12 @@ export function ExceptionDetailPage() {
             <section className="surface-panel">
               <div className="panel-head">
                 <div>
-                  <span className="label-overline">Metadata</span>
+                  <span className="label-overline">事件信息</span>
                   <h3>事件元数据</h3>
                 </div>
               </div>
               <div className="meta-list">
-                <MetaRow label="事件 ID" value={detail.id} />
+                <MetaRow label="事件编号" value={detail.id} />
                 <MetaRow label="指纹" value={detail.fingerprint} />
                 <MetaRow label="应用" value={detail.appName} />
                 <MetaRow label="服务" value={detail.serviceName} />
@@ -190,7 +190,7 @@ export function ExceptionDetailPage() {
                 <MetaRow label="线程" value={detail.threadName} />
                 <MetaRow label="类名" value={detail.className} />
                 <MetaRow label="方法" value={detail.methodName} />
-                <MetaRow label="Trace ID" value={detail.traceId} />
+                <MetaRow label="追踪标识" value={detail.traceId} />
                 <MetaRow label="发生时间" value={formatFullDateTime(detail.occurrenceTime)} />
               </div>
             </section>
@@ -198,7 +198,7 @@ export function ExceptionDetailPage() {
             <section className="surface-panel">
               <div className="panel-head">
                 <div>
-                  <span className="label-overline">Workflow</span>
+                  <span className="label-overline">状态流转</span>
                   <h3>状态流转</h3>
                 </div>
               </div>
@@ -211,7 +211,7 @@ export function ExceptionDetailPage() {
                     disabled={actionLoading}
                     onClick={() => updateStatus(status)}
                   >
-                    {status}
+                    {statusLabel(status)}
                   </button>
                 ))}
               </div>
@@ -220,12 +220,12 @@ export function ExceptionDetailPage() {
             <section className="surface-panel">
               <div className="panel-head">
                 <div>
-                  <span className="label-overline">Agent Sync</span>
+                  <span className="label-overline">采集端同步</span>
                   <h3>采集链路状态</h3>
                 </div>
               </div>
               <div className="meta-list">
-                <MetaRow label="Agent 版本" value={detail.agentVersion} />
+                <MetaRow label="采集端版本" value={detail.agentVersion} />
                 <MetaRow label="配置版本" value={detail.configVersion} />
                 <MetaRow label="同步状态" value={detail.lastConfigSyncStatus} />
                 <MetaRow label="同步时间" value={formatDateTime(detail.lastConfigSyncAt)} />
@@ -234,7 +234,7 @@ export function ExceptionDetailPage() {
               </div>
               {detail.lastConfigSyncError ? (
                 <div className="surface-subpanel">
-                  <span className="label-overline">Last Error</span>
+                  <span className="label-overline">最近错误</span>
                   <p>{detail.lastConfigSyncError}</p>
                 </div>
               ) : null}

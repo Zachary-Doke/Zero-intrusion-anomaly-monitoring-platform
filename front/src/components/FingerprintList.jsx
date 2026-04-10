@@ -6,7 +6,6 @@ export function FingerprintList({ items }) {
     <section className="surface-panel">
       <div className="panel-head">
         <div>
-          <span className="label-overline">Top 指纹</span>
           <h3>高频异常簇</h3>
         </div>
       </div>

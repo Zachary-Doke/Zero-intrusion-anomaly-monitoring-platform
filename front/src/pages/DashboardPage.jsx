@@ -30,14 +30,18 @@ export function DashboardPage() {
   }, []);
 
   const metrics = overview?.metrics;
+  const riskSummary = overview?.riskSummary;
+  const riskHighlights = Array.isArray(riskSummary?.highlights) && riskSummary.highlights.length
+    ? riskSummary.highlights
+    : ["暂无可用的风险摘要，请稍后刷新。"];
+  const riskSourceLabel = (riskSummary?.source || "").toUpperCase() === "AI" ? "AI 生成" : "规则生成";
 
   return (
     <div className="page-stack">
       <header className="page-header">
         <div>
-          <span className="label-overline">Overview</span>
+          <span className="label-overline">总览仪表盘</span>
           <h2>异常概览</h2>
-          <p>沿用设计稿的编辑式留白和层级，但只保留真实可支撑的异常监控指标。</p>
         </div>
         <button type="button" className="button button--primary" onClick={loadOverview} disabled={loading}>
           <span className="material-symbols-outlined">refresh</span>
@@ -58,19 +62,19 @@ export function DashboardPage() {
           icon="inventory_2"
           label="待处理异常"
           value={metrics?.openExceptionCount ?? 0}
-          note="仍处于 OPEN 状态"
+          note="仍处于未处理状态"
           accent="warning"
         />
         <MetricCard
           icon="priority_high"
           label="严重异常"
           value={metrics?.criticalExceptionCount ?? 0}
-          note="Critical + Open"
+          note="严重且未处理"
           accent="critical"
         />
         <MetricCard
-          icon="sync"
-          label="生效 Agent"
+          icon="hub"
+          label="生效采集端"
           value={metrics?.effectiveAgentCount ?? 0}
           note={`${formatNumber(metrics?.serviceCount ?? 0)} 个服务参与采集`}
           accent="secondary"
@@ -84,7 +88,6 @@ export function DashboardPage() {
           <section className="surface-panel">
             <div className="panel-head">
               <div>
-                <span className="label-overline">Recent Events</span>
                 <h3>最近异常</h3>
               </div>
               <Link to="/exceptions" className="panel-link">
@@ -121,14 +124,20 @@ export function DashboardPage() {
           <section className="surface-panel surface-panel--accent">
             <div className="panel-head">
               <div>
-                <span className="label-overline">Focus</span>
-                <h3>当前观察重点</h3>
+                <h3>本日风险摘要</h3>
               </div>
             </div>
+            <div className="event-card__top">
+              <SeverityPill value={riskSummary?.riskLevel || "MEDIUM"} />
+              <span className="panel-footnote">
+                {riskSourceLabel} · {formatDateTime(riskSummary?.updatedAt)}
+              </span>
+            </div>
+            <p className="section-copy">{riskSummary?.summary || "暂无可用的风险摘要，请稍后刷新。"}</p>
             <ul className="bullet-list">
-              <li>优先处理 OPEN 状态的高频异常。</li>
-              <li>配置页只保留采集规则与 AI 接口，降低答辩面。</li>
-              <li>详情页内直接生成处理建议，不再跳独立报告流。</li>
+              {riskHighlights.map((item, index) => (
+                <li key={`${index}-${item}`}>{item}</li>
+              ))}
             </ul>
           </section>
         </div>

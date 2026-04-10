@@ -24,7 +24,7 @@ export function AppShell({ children }) {
           </div>
           <div>
             <h1>异常监控平台</h1>
-            <p>Architectural Observer</p>
+            <p>异常链路观察台</p>
           </div>
         </div>
 

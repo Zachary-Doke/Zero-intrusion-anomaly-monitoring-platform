@@ -101,7 +101,7 @@ export function loginRequest(credentials) {
 
 export const api = {
   getOverview() {
-    return request("/api/dashboard/overview");
+    return request("/api/dashboard/overview", { cache: "no-store" });
   },
   getExceptions(filters) {
     return request(`/api/exceptions${buildQuery(filters)}`);

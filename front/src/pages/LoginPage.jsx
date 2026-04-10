@@ -43,7 +43,7 @@ export function LoginPage() {
         </div>
 
         <div className="login-copy">
-          <span className="label-overline">System Access</span>
+          <span className="label-overline">系统入口</span>
           <h2>以最小操作面维持异常观察力</h2>
           <p>
             只保留登录、总览、异常列表、异常详情与配置页。去掉告警中心和报告中心，聚焦异常采集闭环。
