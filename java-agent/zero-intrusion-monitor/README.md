@@ -69,12 +69,12 @@ mvn clean package -DskipTests
 
 **基础运行（默认配置）：**
 ```bash
-java -javaagent:agent/target/agent-1.0-SNAPSHOT.jar=appName=Demo;packages=com.github.monitor.demo -jar demo-app/target/demo-app-1.0-SNAPSHOT.jar
+java -javaagent:agent/target/agent-1.0-SNAPSHOT.jar=appName=Demo;serviceName=demo;packages=com.github.monitor.demo -jar demo-app/target/demo-app-1.0-SNAPSHOT.jar
 ```
 
 **高级运行（自定义配置）：**
 ```bash
-java -javaagent:agent/target/agent-1.0-SNAPSHOT.jar=appName=ProdApp;env=prod;packages=com.github.monitor.demo;endpoint=http://localhost:8080/api/events/batch;sensitiveFields=password,token;sample.java.lang.IllegalArgumentException=1.0;collectionLimit=10 -jar demo-app/target/demo-app-1.0-SNAPSHOT.jar
+java -javaagent:agent/target/agent-1.0-SNAPSHOT.jar=appName=ProdApp;serviceName=demo;env=prod;packages=com.github.monitor.demo;endpoint=http://localhost:8080/api/events/batch;sensitiveFields=password,token;sample.java.lang.IllegalArgumentException=1.0;collectionLimit=10 -jar demo-app/target/demo-app-1.0-SNAPSHOT.jar
 ```
 
 ---
@@ -86,6 +86,7 @@ Agent 参数通过 `-javaagent:path/to/agent.jar=key1=value1;key2=value2` 的形
 | 参数名 | 默认值 | 说明 |
 | :--- | :--- | :--- |
 | `appName` | unknown-app | 应用名称 |
+| `serviceName` | `appName` | 服务名称；未传或为 `unknown-service` 时自动回落到 `appName` |
 | `env` | dev | 环境名称 (dev/test/prod) |
 | `packages` | (必填) | **监控包前缀**，多个用逗号分隔 (如 `com.myapp,org.test`) |
 | `endpoint` | http://127.0.0.1:8080/api/events/batch | 异常上报 HTTP 接口地址 |

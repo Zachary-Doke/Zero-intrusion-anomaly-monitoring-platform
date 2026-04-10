@@ -28,6 +28,40 @@ export function formatNumber(value) {
   return new Intl.NumberFormat("zh-CN").format(value ?? 0);
 }
 
+function hasLatinLetters(value) {
+  return /[A-Za-z]/.test(value || "");
+}
+
+export function chineseOnlyText(value, fallback = "--") {
+  if (!value && value !== 0) {
+    return fallback;
+  }
+  const text = String(value).trim();
+  if (!text) {
+    return fallback;
+  }
+  return hasLatinLetters(text) ? fallback : text;
+}
+
+export function chineseOnlyMultilineText(value, fallback = "暂无中文内容") {
+  if (!value) {
+    return fallback;
+  }
+  const text = String(value).trim();
+  if (!text) {
+    return fallback;
+  }
+  return hasLatinLetters(text) ? fallback : text;
+}
+
+export function chineseOnlyList(values, fallbackItem = "暂无中文信息") {
+  const items = Array.isArray(values) ? values : [];
+  const normalized = items
+    .map((item) => chineseOnlyText(item, ""))
+    .filter(Boolean);
+  return normalized.length ? normalized : [fallbackItem];
+}
+
 export function formatJsonText(value) {
   if (!value) {
     return "--";
@@ -67,7 +101,7 @@ export function severityLabel(value) {
     case "LOW":
       return "低";
     default:
-      return value || "--";
+      return "未知级别";
   }
 }
 
@@ -93,7 +127,7 @@ export function statusLabel(value) {
     case "RESOLVED":
       return "已解决";
     default:
-      return value || "--";
+      return "未知状态";
   }
 }
 
@@ -109,7 +143,20 @@ export function suggestionStatusLabel(value) {
     case "COMPLETED":
       return "已生成";
     default:
-      return value || "--";
+      return "未知状态";
+  }
+}
+
+export function syncStatusLabel(value) {
+  switch ((value || "").toUpperCase()) {
+    case "SUCCESS":
+      return "成功";
+    case "FAILED":
+      return "失败";
+    case "PENDING":
+      return "待同步";
+    default:
+      return chineseOnlyText(value, "未知状态");
   }
 }
 

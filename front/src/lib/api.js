@@ -1,6 +1,18 @@
 const TOKEN_KEY = "auth_token";
 const USER_KEY = "auth_user";
 
+function hasLatinLetters(value) {
+  return /[A-Za-z]/.test(value || "");
+}
+
+function normalizeErrorMessage(message, fallback) {
+  const text = String(message || "").trim();
+  if (!text) {
+    return fallback;
+  }
+  return hasLatinLetters(text) ? fallback : text;
+}
+
 function redirectToLogin() {
   if (window.location.pathname !== "/login") {
     window.location.assign("/login");
@@ -70,11 +82,11 @@ async function request(path, options = {}) {
   }
 
   if (!response.ok) {
-    throw new Error(payload?.message || `请求失败(${response.status})`);
+    throw new Error(normalizeErrorMessage(payload?.message, `请求失败(${response.status})`));
   }
 
   if (payload && payload.code !== 200) {
-    throw new Error(payload.message || "请求失败");
+    throw new Error(normalizeErrorMessage(payload.message, "请求失败"));
   }
 
   return payload?.data ?? null;

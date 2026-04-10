@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../lib/api";
-import { formatDateTime, formatNumber } from "../lib/format";
+import { chineseOnlyList, chineseOnlyText, formatDateTime, formatNumber } from "../lib/format";
 import { FingerprintList } from "../components/FingerprintList";
 import { MetricCard } from "../components/MetricCard";
 import { SeverityPill, StatusPill } from "../components/StatusPill";
@@ -31,10 +31,8 @@ export function DashboardPage() {
 
   const metrics = overview?.metrics;
   const riskSummary = overview?.riskSummary;
-  const riskHighlights = Array.isArray(riskSummary?.highlights) && riskSummary.highlights.length
-    ? riskSummary.highlights
-    : ["暂无可用的风险摘要，请稍后刷新。"];
-  const riskSourceLabel = (riskSummary?.source || "").toUpperCase() === "AI" ? "AI 生成" : "规则生成";
+  const riskHighlights = chineseOnlyList(riskSummary?.highlights, "暂无可用的风险摘要，请稍后刷新。");
+  const riskSourceLabel = (riskSummary?.source || "").toUpperCase() === "AI" ? "智能生成" : "规则生成";
 
   return (
     <div className="page-stack">
@@ -103,10 +101,10 @@ export function DashboardPage() {
                       <SeverityPill value={item.severity} />
                       <StatusPill value={item.status} />
                     </div>
-                    <strong>{item.summary || item.exceptionClass}</strong>
-                    <p>{item.topStackFrame || item.methodName}</p>
+                    <strong>异常事件</strong>
+                    <p>已过滤技术字段</p>
                     <div className="event-card__meta">
-                      <span>{item.serviceName || item.appName}</span>
+                      <span>已过滤服务字段</span>
                       <span>{formatDateTime(item.occurrenceTime)}</span>
                     </div>
                   </Link>
@@ -133,7 +131,7 @@ export function DashboardPage() {
                 {riskSourceLabel} · {formatDateTime(riskSummary?.updatedAt)}
               </span>
             </div>
-            <p className="section-copy">{riskSummary?.summary || "暂无可用的风险摘要，请稍后刷新。"}</p>
+            <p className="section-copy">{chineseOnlyText(riskSummary?.summary, "暂无可用的风险摘要，请稍后刷新。")}</p>
             <ul className="bullet-list">
               {riskHighlights.map((item, index) => (
                 <li key={`${index}-${item}`}>{item}</li>

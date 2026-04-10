@@ -145,16 +145,10 @@ public class EventCollector {
     }
 
     private static String resolveServiceName(Class<?> clazz) {
-        if (AgentConfig.serviceName != null && !"unknown-service".equals(AgentConfig.serviceName)) {
+        if (AgentConfig.serviceName != null && !AgentConfig.serviceName.trim().isEmpty()) {
             return AgentConfig.serviceName;
         }
-        Package pkg = clazz.getPackage();
-        if (pkg == null) {
-            return AgentConfig.appName;
-        }
-        String packageName = pkg.getName();
-        int index = packageName.lastIndexOf('.');
-        return index >= 0 ? packageName.substring(index + 1) : packageName;
+        return AgentConfig.appName;
     }
 
     private static String inferSeverity(Throwable throwable) {

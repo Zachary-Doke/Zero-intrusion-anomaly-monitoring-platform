@@ -16,8 +16,8 @@ export function FingerprintList({ items }) {
             <article key={item.fingerprint} className="fingerprint-row">
               <div className="fingerprint-row__main">
                 <SeverityPill value={item.severity} />
-                <strong>{item.summary || item.exceptionClass}</strong>
-                <span>{item.serviceName || "未知服务"}</span>
+                <strong>异常簇</strong>
+                <span>已过滤摘要与服务字段</span>
               </div>
               <div className="fingerprint-row__meta">
                 <strong>{formatNumber(item.occurrenceCount)}</strong>

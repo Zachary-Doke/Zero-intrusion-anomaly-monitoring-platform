@@ -280,8 +280,6 @@ export function ExceptionsPage() {
           <table className="data-table">
             <colgroup>
               <col className="data-col data-col--severity" />
-              <col className="data-col data-col--summary" />
-              <col className="data-col data-col--service" />
               <col className="data-col data-col--time" />
               <col className="data-col data-col--status" />
               <col className="data-col data-col--action" />
@@ -289,8 +287,6 @@ export function ExceptionsPage() {
             <thead>
               <tr>
                 <th>严重程度</th>
-                <th>摘要</th>
-                <th>服务 / 方法</th>
                 <th>发生时间</th>
                 <th>状态</th>
                 <th>操作</th>
@@ -302,26 +298,6 @@ export function ExceptionsPage() {
                   <tr key={item.id}>
                     <td>
                       <SeverityPill value={item.severity} />
-                    </td>
-                    <td>
-                      <strong>{item.summary || item.exceptionClass}</strong>
-                      <p>{item.traceId || item.fingerprint}</p>
-                    </td>
-                    <td className="cell-service">
-                      <div className="service-cell" tabIndex="0">
-                        <strong className="cell-truncate">{item.serviceName || item.appName || "-"}</strong>
-                        <p className="cell-truncate">{item.topStackFrame || item.methodName || "-"}</p>
-                        <div className="service-tooltip" role="tooltip">
-                          <div className="service-tooltip__row">
-                            <span>服务</span>
-                            <strong>{item.serviceName || item.appName || "-"}</strong>
-                          </div>
-                          <div className="service-tooltip__row">
-                            <span>方法</span>
-                            <p>{item.topStackFrame || item.methodName || "-"}</p>
-                          </div>
-                        </div>
-                      </div>
                     </td>
                     <td className="cell-time">{formatDateTime(item.occurrenceTime)}</td>
                     <td className="cell-status">
@@ -336,7 +312,7 @@ export function ExceptionsPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6">
+                  <td colSpan="4">
                     <div className="empty-state">{loading ? "正在加载..." : "当前筛选条件下暂无异常"}</div>
                   </td>
                 </tr>

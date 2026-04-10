@@ -6,6 +6,37 @@ function numericValue(value) {
   return value === "" ? "" : Number(value);
 }
 
+const RESTART_REQUIRED_FIELDS = [
+  { key: "packagePatterns", label: "包名过滤器" },
+  { key: "queueCapacity", label: "队列容量" }
+];
+
+function normalizeComparableValue(key, value) {
+  if (key === "packagePatterns") {
+    return String(value || "")
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .join(",");
+  }
+  if (value === null || value === undefined || value === "") {
+    return "";
+  }
+  if (typeof value === "number") {
+    return Number(value);
+  }
+  if (typeof value === "boolean") {
+    return value;
+  }
+  return String(value).trim();
+}
+
+function changedRestartFieldLabels(before, after) {
+  return RESTART_REQUIRED_FIELDS
+    .filter((item) => normalizeComparableValue(item.key, before?.[item.key]) !== normalizeComparableValue(item.key, after?.[item.key]))
+    .map((item) => item.label);
+}
+
 export function SettingsPage() {
   const [settings, setSettings] = useState(null);
   const [statuses, setStatuses] = useState([]);
@@ -50,7 +81,14 @@ export function SettingsPage() {
     try {
       const saved = await api.saveSettings(settings);
       setSettings(saved);
-      setMessage("配置已保存，采集端将在下一次拉取时生效。");
+      const changedRestartFields = changedRestartFieldLabels(settings, saved);
+      if (changedRestartFields.length) {
+        setMessage(
+          `配置已保存。${changedRestartFields.join("、")}已变更，需重启挂载 Agent 的应用后生效；其余项将在下一次拉取时生效（默认30秒）。`
+        );
+      } else {
+        setMessage("配置已保存，采集端将在下一次拉取时生效（默认30秒）。");
+      }
       const latestStatuses = await api.getAgentSyncStatuses();
       setStatuses(latestStatuses || []);
     } catch (submitError) {
@@ -66,7 +104,6 @@ export function SettingsPage() {
         <div>
           <span className="label-overline">配置中心</span>
           <h2>采集规则与智能分析接口</h2>
-          <p>删掉阈值告警和报告中心后，配置页只保留当前主线真正需要的参数。</p>
         </div>
       </header>
 
@@ -81,10 +118,21 @@ export function SettingsPage() {
               <span className="label-overline">采集规则</span>
               <h3>采集端捕获规则</h3>
               <p className="section-copy">远程配置为主，本地参数只保留接入兜底。这里控制包名、采样和快照深度。</p>
+              <div className="sync-rule-panel">
+                <p>
+                  <strong>热更新项：</strong> 保存后由采集端自动拉取生效，默认约 30 秒内。
+                </p>
+                <p>
+                  <strong>需重启项：</strong> 包名过滤器、队列容量。修改后请重启挂载 Agent 的应用。
+                </p>
+              </div>
             </div>
-            <div className="surface-panel form-panel">
+            <div className="surface-panel form-panel form-panel--rules">
               <label className="field">
-                <span>包名过滤器</span>
+                <span className="field-title-row">
+                  <span>包名过滤器</span>
+                  <span className="pill pill--restart">需重启应用</span>
+                </span>
                 <input
                   value={settings.packagePatterns || ""}
                   onChange={(event) => updateField("packagePatterns", event.target.value)}
@@ -94,7 +142,10 @@ export function SettingsPage() {
 
               <label className="toggle-row">
                 <div>
-                  <strong>深度采样</strong>
+                  <div className="field-title-row field-title-row--tight">
+                    <strong>深度采样</strong>
+                    <span className="pill pill--hot">热更新</span>
+                  </div>
                   <span>开启后同步扩展 this 快照与更完整的上下文。</span>
                 </div>
                 <input
@@ -104,9 +155,12 @@ export function SettingsPage() {
                 />
               </label>
 
-              <div className="form-grid">
+              <div className="form-grid settings-rules-grid">
                 <label className="field">
-                  <span>快照深度限制</span>
+                  <span className="field-title-row">
+                    <span>快照深度限制</span>
+                    <span className="pill pill--hot">热更新</span>
+                  </span>
                   <input
                     type="number"
                     value={settings.depthLimit ?? ""}
@@ -114,7 +168,10 @@ export function SettingsPage() {
                   />
                 </label>
                 <label className="field">
-                  <span>文本长度限制</span>
+                  <span className="field-title-row">
+                    <span>文本长度限制</span>
+                    <span className="pill pill--hot">热更新</span>
+                  </span>
                   <input
                     type="number"
                     value={settings.lengthLimit ?? ""}
@@ -122,7 +179,10 @@ export function SettingsPage() {
                   />
                 </label>
                 <label className="field">
-                  <span>集合数量限制</span>
+                  <span className="field-title-row">
+                    <span>集合数量限制</span>
+                    <span className="pill pill--hot">热更新</span>
+                  </span>
                   <input
                     type="number"
                     value={settings.collectionLimit ?? ""}
@@ -130,7 +190,10 @@ export function SettingsPage() {
                   />
                 </label>
                 <label className="field">
-                  <span>默认采样率</span>
+                  <span className="field-title-row">
+                    <span>默认采样率</span>
+                    <span className="pill pill--hot">热更新</span>
+                  </span>
                   <input
                     type="number"
                     step="0.1"
@@ -139,7 +202,10 @@ export function SettingsPage() {
                   />
                 </label>
                 <label className="field">
-                  <span>队列容量</span>
+                  <span className="field-title-row">
+                    <span>队列容量</span>
+                    <span className="pill pill--restart">需重启应用</span>
+                  </span>
                   <input
                     type="number"
                     value={settings.queueCapacity ?? ""}
@@ -147,7 +213,10 @@ export function SettingsPage() {
                   />
                 </label>
                 <label className="field">
-                  <span>刷新间隔（毫秒）</span>
+                  <span className="field-title-row">
+                    <span>刷新间隔（毫秒）</span>
+                    <span className="pill pill--hot">热更新</span>
+                  </span>
                   <input
                     type="number"
                     value={settings.flushIntervalMs ?? ""}
@@ -161,8 +230,8 @@ export function SettingsPage() {
           <section className="settings-grid">
             <div>
               <span className="label-overline">智能分析</span>
-              <h3>智能分析接口配置</h3>
-              <p className="section-copy">异常详情页会读取这里的接口配置，直接在详情内生成处理建议，不再进入独立报告中心。</p>
+              <h3>AI接口配置</h3>
+              <p className="section-copy">在这里可统一配置 AI 接口地址、模型、接口密钥和提示词模板，异常详情页会直接按此配置生成处理建议。</p>
             </div>
             <div className="surface-panel form-panel">
               <div className="form-grid">
@@ -171,7 +240,7 @@ export function SettingsPage() {
                   <input
                     value={settings.aiBaseUrl || ""}
                     onChange={(event) => updateField("aiBaseUrl", event.target.value)}
-                    placeholder="https://api.deepseek.com"
+                    placeholder="请输入接口地址"
                   />
                 </label>
                 <label className="field">
@@ -179,13 +248,18 @@ export function SettingsPage() {
                   <input
                     value={settings.aiModel || ""}
                     onChange={(event) => updateField("aiModel", event.target.value)}
-                    placeholder="deepseek-chat"
+                    placeholder="请输入模型名称"
                   />
                 </label>
               </div>
 
               <label className="field">
-                <span>接口密钥</span>
+                <span className="field-title-row">
+                  <span>接口密钥</span>
+                  <span className={`pill ${settings.aiApiKeyConfigured ? "pill--resolved" : "pill--neutral"}`}>
+                    {settings.aiApiKeyConfigured ? "已配置" : "未配置"}
+                  </span>
+                </span>
                 <input
                   type="password"
                   value={settings.aiApiKey || ""}
@@ -193,6 +267,11 @@ export function SettingsPage() {
                   autoComplete="new-password"
                   placeholder={settings.aiApiKeyConfigured ? "已配置，留空则保持不变" : "请输入模型接口密钥"}
                 />
+                <small className="field-helper">
+                  {settings.aiApiKeyConfigured
+                    ? "当前已配置密钥：留空提交不会覆盖；输入新密钥后保存将更新。"
+                    : "当前未配置密钥：请输入后保存。"}
+                </small>
               </label>
 
               <label className="field">
@@ -217,8 +296,8 @@ export function SettingsPage() {
                 statuses.map((item) => (
                   <article key={`${item.appName}-${item.serviceName}`} className={`sync-card ${item.effective ? "sync-card--effective" : ""}`}>
                     <div className="sync-card__head">
-                      <strong>{item.serviceName}</strong>
-                      <span>{item.appName}</span>
+                      <strong>{item.serviceName || "--"}</strong>
+                      <span>{item.appName || "--"}</span>
                     </div>
                     <dl>
                       <div>

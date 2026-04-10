@@ -1,7 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api } from "../lib/api";
-import { formatDateTime, formatFullDateTime, formatJsonText, safeArray, statusLabel, suggestionStatusLabel } from "../lib/format";
+import {
+  chineseOnlyText,
+  formatDateTime,
+  formatFullDateTime,
+  safeArray,
+  statusLabel,
+  suggestionStatusLabel,
+  syncStatusLabel
+} from "../lib/format";
 import { SeverityPill, StatusPill } from "../components/StatusPill";
 
 const STATUS_OPTIONS = ["OPEN", "INVESTIGATING", "RESOLVED"];
@@ -10,7 +18,7 @@ function MetaRow({ label, value }) {
   return (
     <div className="meta-row">
       <span>{label}</span>
-      <strong>{value || "--"}</strong>
+      <strong>{chineseOnlyText(value, "--")}</strong>
     </div>
   );
 }
@@ -21,6 +29,9 @@ export function ExceptionDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
+  const troubleshootingSteps = safeArray(detail?.suggestion?.troubleshootingSteps)
+    .map((item) => chineseOnlyText(item, ""))
+    .filter(Boolean);
 
   async function loadDetail() {
     setLoading(true);
@@ -75,8 +86,8 @@ export function ExceptionDetailPage() {
             返回异常列表
           </Link>
           <span className="label-overline">异常详情</span>
-          <h2>{detail?.summary || detail?.exceptionClass || "异常详情"}</h2>
-          <p>{detail?.topStackFrame || "查看完整上下文、根因分析和处理建议"}</p>
+          <h2>异常详情</h2>
+          <p>已移除技术字段展示，仅保留处理信息。</p>
         </div>
         <div className="action-row">
           <SeverityPill value={detail?.severity} />
@@ -98,11 +109,11 @@ export function ExceptionDetailPage() {
                 </div>
                 <span className="panel-footnote">状态：{suggestionStatusLabel(detail.suggestion?.suggestionStatus || "READY")}</span>
               </div>
-              <p className="analysis-copy">{detail.suggestion?.rootCauseAnalysis || "暂无根因分析。"}</p>
+              <p className="analysis-copy">{chineseOnlyText(detail.suggestion?.rootCauseAnalysis, "暂无根因分析。")}</p>
               {detail.suggestion?.impactScope ? (
                 <div className="surface-subpanel">
                   <span className="label-overline">影响范围</span>
-                  <p>{detail.suggestion.impactScope}</p>
+                  <p>{chineseOnlyText(detail.suggestion.impactScope, "影响范围信息已隐藏")}</p>
                 </div>
               ) : null}
             </section>
@@ -125,51 +136,16 @@ export function ExceptionDetailPage() {
               </div>
 
               <p className="analysis-copy">
-                {detail.suggestion?.fixSuggestion || "当前只展示默认根因分析。点击右上角按钮生成可执行处理建议。"}
+                {chineseOnlyText(detail.suggestion?.fixSuggestion, "当前只展示默认根因分析。点击右上角按钮生成可执行处理建议。")}
               </p>
 
-              {safeArray(detail.suggestion?.troubleshootingSteps).length ? (
+              {troubleshootingSteps.length ? (
                 <ul className="bullet-list">
-                  {detail.suggestion.troubleshootingSteps.map((item) => (
+                  {troubleshootingSteps.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
               ) : null}
-            </section>
-
-            <section className="surface-panel">
-              <div className="panel-head">
-                <div>
-                  <span className="label-overline">堆栈信息</span>
-                  <h3>堆栈与消息</h3>
-                </div>
-              </div>
-              <div className="stack-console">
-                <pre>{detail.stackTrace || detail.message || "--"}</pre>
-              </div>
-            </section>
-
-            <section className="surface-panel">
-              <div className="panel-head">
-                <div>
-                  <span className="label-overline">上下文</span>
-                  <h3>上下文快照</h3>
-                </div>
-              </div>
-              <div className="context-grid">
-                <div className="surface-subpanel">
-                  <span className="label-overline">参数快照</span>
-                  <pre className="json-block">{formatJsonText(detail.argumentsSnapshot)}</pre>
-                </div>
-                <div className="surface-subpanel">
-                  <span className="label-overline">对象快照</span>
-                  <pre className="json-block">{formatJsonText(detail.thisSnapshot)}</pre>
-                </div>
-                <div className="surface-subpanel surface-subpanel--wide">
-                  <span className="label-overline">追踪上下文</span>
-                  <pre className="json-block">{formatJsonText(detail.traceContext)}</pre>
-                </div>
-              </div>
             </section>
           </div>
 
@@ -183,14 +159,6 @@ export function ExceptionDetailPage() {
               </div>
               <div className="meta-list">
                 <MetaRow label="事件编号" value={detail.id} />
-                <MetaRow label="指纹" value={detail.fingerprint} />
-                <MetaRow label="应用" value={detail.appName} />
-                <MetaRow label="服务" value={detail.serviceName} />
-                <MetaRow label="环境" value={detail.environment} />
-                <MetaRow label="线程" value={detail.threadName} />
-                <MetaRow label="类名" value={detail.className} />
-                <MetaRow label="方法" value={detail.methodName} />
-                <MetaRow label="追踪标识" value={detail.traceId} />
                 <MetaRow label="发生时间" value={formatFullDateTime(detail.occurrenceTime)} />
               </div>
             </section>
@@ -225,19 +193,12 @@ export function ExceptionDetailPage() {
                 </div>
               </div>
               <div className="meta-list">
-                <MetaRow label="采集端版本" value={detail.agentVersion} />
                 <MetaRow label="配置版本" value={detail.configVersion} />
-                <MetaRow label="同步状态" value={detail.lastConfigSyncStatus} />
+                <MetaRow label="同步状态" value={syncStatusLabel(detail.lastConfigSyncStatus)} />
                 <MetaRow label="同步时间" value={formatDateTime(detail.lastConfigSyncAt)} />
                 <MetaRow label="队列深度" value={detail.queueSize} />
                 <MetaRow label="丢弃数量" value={detail.droppedCount} />
               </div>
-              {detail.lastConfigSyncError ? (
-                <div className="surface-subpanel">
-                  <span className="label-overline">最近错误</span>
-                  <p>{detail.lastConfigSyncError}</p>
-                </div>
-              ) : null}
             </section>
           </aside>
         </div>

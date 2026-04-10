@@ -9,10 +9,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class AgentSyncStatusService {
+
+    private static final String UNKNOWN_SERVICE = "unknown-service";
+    private static final String UNKNOWN_APP = "unknown-app";
 
     private final AgentSyncStatusRepository repository;
 
@@ -84,7 +89,7 @@ public class AgentSyncStatusService {
     }
 
     public List<AgentSyncStatusDto> listStatuses() {
-        return repository.findAll().stream()
+        return effectiveStatuses().stream()
                 .sorted((left, right) -> {
                     LocalDateTime l = left.getLastSeenAt();
                     LocalDateTime r = right.getLastSeenAt();
@@ -104,18 +109,18 @@ public class AgentSyncStatusService {
     }
 
     public long countEffective(long targetVersion) {
-        return repository.findAll().stream()
+        return effectiveStatuses().stream()
                 .filter(item -> targetVersion > 0 && safeLong(item.getLastSuccessfulConfigVersion()) >= targetVersion)
                 .count();
     }
 
     public long countAgents() {
-        return repository.count();
+        return effectiveStatuses().size();
     }
 
     private AgentSyncStatus loadOrCreate(String serviceName, String appName) {
-        String normalizedService = StringUtils.hasText(serviceName) ? serviceName.trim() : "unknown-service";
-        String normalizedApp = StringUtils.hasText(appName) ? appName.trim() : "unknown-app";
+        String normalizedApp = normalizeAppName(appName);
+        String normalizedService = normalizeServiceName(serviceName, normalizedApp);
         String id = normalizedApp + "::" + normalizedService;
         return repository.findById(id).orElseGet(() -> {
             AgentSyncStatus status = new AgentSyncStatus();
@@ -125,6 +130,44 @@ public class AgentSyncStatusService {
             status.setTargetConfigVersion(0L);
             return status;
         });
+    }
+
+    private List<AgentSyncStatus> effectiveStatuses() {
+        List<AgentSyncStatus> all = repository.findAll();
+        Set<String> appsWithKnownService = new HashSet<>();
+        for (AgentSyncStatus status : all) {
+            String app = normalizeAppName(status.getAppName());
+            if (!isUnknownService(status.getServiceName())) {
+                appsWithKnownService.add(app);
+            }
+        }
+        return all.stream()
+                .filter(status -> !shouldHideLegacyUnknownService(status, appsWithKnownService))
+                .toList();
+    }
+
+    private boolean shouldHideLegacyUnknownService(AgentSyncStatus status, Set<String> appsWithKnownService) {
+        return isUnknownService(status.getServiceName())
+                && appsWithKnownService.contains(normalizeAppName(status.getAppName()));
+    }
+
+    private String normalizeAppName(String appName) {
+        return StringUtils.hasText(appName) ? appName.trim() : UNKNOWN_APP;
+    }
+
+    private String normalizeServiceName(String serviceName, String normalizedApp) {
+        if (!StringUtils.hasText(serviceName)) {
+            return normalizedApp;
+        }
+        String value = serviceName.trim();
+        if (isUnknownService(value)) {
+            return normalizedApp;
+        }
+        return value;
+    }
+
+    private boolean isUnknownService(String serviceName) {
+        return !StringUtils.hasText(serviceName) || UNKNOWN_SERVICE.equalsIgnoreCase(serviceName.trim());
     }
 
     private AgentSyncStatusDto toDto(AgentSyncStatus status) {

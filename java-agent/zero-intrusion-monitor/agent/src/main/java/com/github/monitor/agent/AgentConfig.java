@@ -57,6 +57,7 @@ public class AgentConfig {
 
     public static void parse(String args) {
         if (args == null || args.isEmpty()) {
+            normalizeIdentity();
             return;
         }
 
@@ -154,6 +155,22 @@ public class AgentConfig {
                     }
                     break;
             }
+        }
+        normalizeIdentity();
+    }
+
+    static void normalizeIdentity() {
+        if (appName == null || appName.trim().isEmpty()) {
+            appName = "unknown-app";
+        } else {
+            appName = appName.trim();
+        }
+
+        if (serviceName == null || serviceName.trim().isEmpty()
+                || "unknown-service".equalsIgnoreCase(serviceName.trim())) {
+            serviceName = appName;
+        } else {
+            serviceName = serviceName.trim();
         }
     }
 

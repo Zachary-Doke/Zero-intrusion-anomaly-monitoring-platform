@@ -1,5 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import { chineseOnlyText } from "../lib/format";
 
 function NavItem({ to, icon, label, active }) {
   return (
@@ -14,6 +15,8 @@ export function AppShell({ children }) {
   const { user, logout, isAdmin } = useAuth();
   const location = useLocation();
   const exceptionActive = location.pathname.startsWith("/exceptions");
+  const userName = chineseOnlyText(user?.displayName || user?.username, "当前用户");
+  const userAvatar = userName ? userName.slice(0, 1) : "用";
 
   return (
     <div className="app-layout">
@@ -38,9 +41,9 @@ export function AppShell({ children }) {
 
         <div className="sidebar-footer">
           <div className="user-card">
-            <div className="user-avatar">{(user?.displayName || "A").slice(0, 1)}</div>
+            <div className="user-avatar">{userAvatar}</div>
             <div className="user-meta">
-              <strong>{user?.displayName || user?.username}</strong>
+              <strong>{userName}</strong>
               <span>{user?.role === "ADMIN" ? "管理员" : "运维用户"}</span>
             </div>
           </div>

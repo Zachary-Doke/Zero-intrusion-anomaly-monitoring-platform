@@ -52,7 +52,7 @@ if exist "%LOG_OUT%" del /f /q "%LOG_OUT%"
 if exist "%LOG_ERR%" del /f /q "%LOG_ERR%"
 
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-  "$args = @('-javaagent:%AGENT_JAR%=appName=VerifyDemo;packages=com.github.monitor.demo;endpoint=http://127.0.0.1:65535/ingest;sensitiveFields=sensitive,password,token;collectionLimit=10','-jar','%DEMO_JAR%'); $p = Start-Process -FilePath 'java' -ArgumentList $args -RedirectStandardOutput '%LOG_OUT%' -RedirectStandardError '%LOG_ERR%' -PassThru; Start-Sleep -Seconds 15; if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue }"
+  "$args = @('-javaagent:%AGENT_JAR%=appName=VerifyDemo;serviceName=demo;packages=com.github.monitor.demo;endpoint=http://127.0.0.1:65535/ingest;sensitiveFields=sensitive,password,token;collectionLimit=10','-jar','%DEMO_JAR%'); $p = Start-Process -FilePath 'java' -ArgumentList $args -RedirectStandardOutput '%LOG_OUT%' -RedirectStandardError '%LOG_ERR%' -PassThru; Start-Sleep -Seconds 15; if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue }"
 
 if exist "%LOG_OUT%" type "%LOG_OUT%" > "%LOG_FILE%"
 if exist "%LOG_ERR%" type "%LOG_ERR%" >> "%LOG_FILE%"

@@ -522,6 +522,12 @@ pre {
   background: rgba(255, 255, 255, 0.7);
 }
 
+.form-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .filters-panel {
   position: relative;
   z-index: 20;
@@ -732,6 +738,13 @@ pre {
 .field textarea {
   resize: vertical;
   min-height: 120px;
+}
+
+.field-helper {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  line-height: 1.5;
 }
 
 .toggle-row {
@@ -1106,6 +1119,16 @@ pre {
   background: rgba(227, 248, 236, 0.92);
 }
 
+.pill--hot {
+  color: #00568f;
+  background: rgba(214, 240, 255, 0.9);
+}
+
+.pill--restart {
+  color: #8d3e00;
+  background: rgba(255, 233, 208, 0.92);
+}
+
 .detail-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.95fr);
@@ -1174,6 +1197,51 @@ pre {
   display: grid;
   grid-template-columns: minmax(240px, 0.7fr) minmax(0, 1.3fr);
   gap: 20px;
+}
+
+.form-panel--rules {
+  gap: 14px;
+}
+
+.sync-rule-panel {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(112, 119, 133, 0.18);
+  display: grid;
+  gap: 6px;
+}
+
+.sync-rule-panel p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.field-title-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field-title-row--tight {
+  gap: 6px;
+}
+
+.settings-rules-grid {
+  grid-template-columns: repeat(auto-fit, minmax(168px, 220px));
+  justify-content: flex-start;
+  gap: 12px 14px;
+}
+
+.settings-rules-grid .field {
+  min-width: 0;
+}
+
+.settings-rules-grid .field input {
+  padding: 10px 4px 10px;
 }
 
 .status-board {
