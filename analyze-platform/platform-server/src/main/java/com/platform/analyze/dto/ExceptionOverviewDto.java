@@ -14,4 +14,5 @@ public class ExceptionOverviewDto {
     private List<ExceptionTrendDto> trends;
     private List<ExceptionListItemDto> recentEvents;
     private List<ExceptionFingerprint> topFingerprints;
+    private RiskSummaryDto riskSummary;
 }
