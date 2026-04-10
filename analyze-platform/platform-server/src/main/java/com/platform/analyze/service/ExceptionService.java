@@ -10,11 +10,14 @@ import com.platform.analyze.dto.ExceptionOverviewDto;
 import com.platform.analyze.dto.ExceptionSuggestionDto;
 import com.platform.analyze.dto.ExceptionTrendDto;
 import com.platform.analyze.dto.OverviewMetricDto;
+import com.platform.analyze.dto.RiskSummaryDto;
 import com.platform.analyze.entity.ExceptionEvent;
 import com.platform.analyze.entity.ExceptionFingerprint;
 import com.platform.analyze.repository.ExceptionEventRepository;
 import com.platform.analyze.repository.ExceptionFingerprintRepository;
 import jakarta.persistence.criteria.Predicate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -34,9 +38,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 public class ExceptionService {
+
+    private static final Logger log = LoggerFactory.getLogger(ExceptionService.class);
 
     private final ExceptionEventRepository eventRepository;
     private final ExceptionFingerprintRepository fingerprintRepository;
@@ -46,6 +54,9 @@ public class ExceptionService {
     private final AgentSyncStatusService agentSyncStatusService;
     private final RuleSettingsService ruleSettingsService;
     private final AiAnalysisService aiAnalysisService;
+    private final AtomicBoolean dailyRiskSummaryRefreshing = new AtomicBoolean(false);
+
+    private volatile DailyRiskSummarySnapshot dailyRiskSummarySnapshot;
 
     public ExceptionService(ExceptionEventRepository eventRepository,
                             ExceptionFingerprintRepository fingerprintRepository,
@@ -227,7 +238,51 @@ public class ExceptionService {
         if (topFingerprints.isEmpty()) {
             topFingerprints = sortedFingerprints().stream().limit(8).toList();
         }
-        return new ExceptionOverviewDto(metrics, getTrends(7), recentEvents, topFingerprints);
+        List<ExceptionTrendDto> trends = getTrends(7);
+        RiskSummaryDto riskSummary = resolveDailyRiskSummary(metrics, trends, topFingerprints, recentEvents);
+        return new ExceptionOverviewDto(metrics, trends, recentEvents, topFingerprints, riskSummary);
+    }
+
+    private RiskSummaryDto resolveDailyRiskSummary(OverviewMetricDto metrics,
+                                                   List<ExceptionTrendDto> trends,
+                                                   List<ExceptionFingerprint> topFingerprints,
+                                                   List<ExceptionListItemDto> recentEvents) {
+        LocalDate today = LocalDate.now();
+        DailyRiskSummarySnapshot snapshot = dailyRiskSummarySnapshot;
+        if (snapshot != null && today.equals(snapshot.date())) {
+            return snapshot.summary();
+        }
+
+        triggerDailyRiskSummaryRefresh(today, metrics, trends, topFingerprints, recentEvents);
+        return aiAnalysisService.generateRuleDailyRiskSummary(metrics, trends, topFingerprints, recentEvents);
+    }
+
+    private void triggerDailyRiskSummaryRefresh(LocalDate today,
+                                                OverviewMetricDto metrics,
+                                                List<ExceptionTrendDto> trends,
+                                                List<ExceptionFingerprint> topFingerprints,
+                                                List<ExceptionListItemDto> recentEvents) {
+        if (!dailyRiskSummaryRefreshing.compareAndSet(false, true)) {
+            return;
+        }
+        List<ExceptionTrendDto> trendSnapshot = trends == null ? List.of() : List.copyOf(trends);
+        List<ExceptionFingerprint> topFingerprintSnapshot = topFingerprints == null ? List.of() : List.copyOf(topFingerprints);
+        List<ExceptionListItemDto> recentEventSnapshot = recentEvents == null ? List.of() : List.copyOf(recentEvents);
+        CompletableFuture.runAsync(() -> {
+            try {
+                RiskSummaryDto refreshed = aiAnalysisService.generateDailyRiskSummary(
+                        metrics,
+                        trendSnapshot,
+                        topFingerprintSnapshot,
+                        recentEventSnapshot
+                );
+                dailyRiskSummarySnapshot = new DailyRiskSummarySnapshot(today, refreshed);
+            } catch (Exception ex) {
+                log.warn("异步刷新本日风险摘要失败，将继续使用规则摘要: {}", ex.getMessage());
+            } finally {
+                dailyRiskSummaryRefreshing.set(false);
+            }
+        });
     }
 
     @Transactional
@@ -432,5 +487,8 @@ public class ExceptionService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(fieldName + " 序列化失败", e);
         }
+    }
+
+    private record DailyRiskSummarySnapshot(LocalDate date, RiskSummaryDto summary) {
     }
 }
