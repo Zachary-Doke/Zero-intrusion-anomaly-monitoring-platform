@@ -63,12 +63,6 @@ async function request(path, options = {}) {
     body: body === undefined ? undefined : JSON.stringify(body)
   });
 
-  if (response.status === 401) {
-    clearStoredAuth();
-    redirectToLogin();
-    throw new Error("登录状态已失效");
-  }
-
   let payload = null;
   const raw = await response.text();
   if (raw) {
@@ -79,6 +73,15 @@ async function request(path, options = {}) {
         message: raw
       };
     }
+  }
+
+  if (response.status === 401) {
+    if (auth) {
+      clearStoredAuth();
+      redirectToLogin();
+      throw new Error("登录状态已失效");
+    }
+    throw new Error(normalizeErrorMessage(payload?.message, `请求失败(${response.status})`));
   }
 
   if (!response.ok) {

@@ -28,10 +28,6 @@ export function formatNumber(value) {
   return new Intl.NumberFormat("zh-CN").format(value ?? 0);
 }
 
-function hasLatinLetters(value) {
-  return /[A-Za-z]/.test(value || "");
-}
-
 export function chineseOnlyText(value, fallback = "--") {
   if (!value && value !== 0) {
     return fallback;
@@ -40,7 +36,7 @@ export function chineseOnlyText(value, fallback = "--") {
   if (!text) {
     return fallback;
   }
-  return hasLatinLetters(text) ? fallback : text;
+  return text;
 }
 
 export function chineseOnlyMultilineText(value, fallback = "暂无中文内容") {
@@ -51,7 +47,7 @@ export function chineseOnlyMultilineText(value, fallback = "暂无中文内容")
   if (!text) {
     return fallback;
   }
-  return hasLatinLetters(text) ? fallback : text;
+  return text;
 }
 
 export function chineseOnlyList(values, fallbackItem = "暂无中文信息") {

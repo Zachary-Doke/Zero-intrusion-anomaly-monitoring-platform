@@ -1,9 +1,19 @@
 # 仓库贡献指南
 
+## 文档中心
+- 总入口：[`docs/README.md`](docs/README.md)
+- 后端 API：[`docs/api/API.md`](docs/api/API.md)
+- 数据库说明：[`docs/database/schema-and-data-flow.md`](docs/database/schema-and-data-flow.md)
+- 数据库脚本：[`database/README.md`](database/README.md)
+- 本地部署指南：[`docs/deploy/local-dev-setup.md`](docs/deploy/local-dev-setup.md)
+- 运维 Runbook：[`docs/ops/runbook.md`](docs/ops/runbook.md)
+- 测试策略：[`docs/testing/test-strategy.md`](docs/testing/test-strategy.md)
+
 ## 项目结构与模块组织
-本仓库包含两个独立的 Java 子项目：
+本仓库包含多个子项目：
 - `java-agent/zero-intrusion-monitor/`：Java Agent 多模块工程（`agent`、`demo-app`），用于异常捕获与异步上报。
-- `analyze-platform/platform-server/`：基于 Spring Boot 的分析服务（REST、JPA、H2、OpenAPI）。
+- `analyze-platform/platform-server/`：基于 Spring Boot 的分析服务（REST、JPA、PostgreSQL、OpenAPI，测试使用 H2）。
+- `front/`：基于 `React 18 + Vite` 的前端应用，负责登录、看板、异常查询与配置管理页面。
 
 各模块遵循 Maven 标准目录：
 - `src/main/java`：业务代码
@@ -19,6 +29,13 @@
 - 挂载 Agent 运行 Demo：
   `java -javaagent:agent/target/agent-1.0-SNAPSHOT.jar=appName=Demo;packages=com.github.monitor.demo -jar demo-app/target/demo-app-1.0-SNAPSHOT.jar`
 - 平台服务启动：`cd analyze-platform/platform-server && mvn spring-boot:run`
+  - 需先设置环境变量：`PLATFORM_DB_URL`、`PLATFORM_DB_USERNAME`、`PLATFORM_DB_PASSWORD`
+- 前端依赖安装：`cd front && npm install`
+- 前端本地开发：`cd front && npm run dev`
+- 前端生产构建：`cd front && npm run build`
+- 前端构建预览：`cd front && npm run preview`
+  - 前端开发默认地址：`http://127.0.0.1:5173`
+  - 前端开发态会将 `/api` 代理到：`http://127.0.0.1:8080`
 
 Windows 可使用 `java-agent/` 下脚本：`build.bat`、`run-demo.bat`、`verify-demo.bat`。
 

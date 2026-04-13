@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { api } from "../lib/api";
 import {
   chineseOnlyText,
+  formatJsonText,
   formatDateTime,
   formatFullDateTime,
   safeArray,
@@ -87,7 +88,7 @@ export function ExceptionDetailPage() {
           </Link>
           <span className="label-overline">异常详情</span>
           <h2>异常详情</h2>
-          <p>已移除技术字段展示，仅保留处理信息。</p>
+          <p>展示完整异常信息与处理信息。</p>
         </div>
         <div className="action-row">
           <SeverityPill value={detail?.severity} />
@@ -146,6 +147,92 @@ export function ExceptionDetailPage() {
                   ))}
                 </ul>
               ) : null}
+            </section>
+
+            <section className="surface-panel">
+              <div className="panel-head">
+                <div>
+                  <span className="label-overline">完整上下文</span>
+                  <h3>异常上下文详情</h3>
+                </div>
+              </div>
+
+              <div className="context-grid">
+                <div className="surface-subpanel">
+                  <span className="label-overline">定位信息</span>
+                  <div className="meta-list">
+                    <MetaRow label="指纹" value={detail.fingerprint} />
+                    <MetaRow label="应用" value={detail.appName} />
+                    <MetaRow label="服务" value={detail.serviceName} />
+                    <MetaRow label="环境" value={detail.environment} />
+                  </div>
+                </div>
+
+                <div className="surface-subpanel">
+                  <span className="label-overline">运行实例</span>
+                  <div className="meta-list">
+                    <MetaRow label="主机" value={detail.host} />
+                    <MetaRow label="进程 ID" value={detail.pid} />
+                    <MetaRow label="线程" value={detail.threadName} />
+                    <MetaRow label="Agent 版本" value={detail.agentVersion} />
+                  </div>
+                </div>
+
+                <div className="surface-subpanel">
+                  <span className="label-overline">异常类型</span>
+                  <div className="meta-list">
+                    <MetaRow label="异常类" value={detail.exceptionClass} />
+                    <MetaRow label="类名" value={detail.className} />
+                    <MetaRow label="方法名" value={detail.methodName} />
+                    <MetaRow label="栈顶帧" value={detail.topStackFrame} />
+                  </div>
+                </div>
+
+                <div className="surface-subpanel">
+                  <span className="label-overline">追踪信息</span>
+                  <div className="meta-list">
+                    <MetaRow label="Trace ID" value={detail.traceId} />
+                    <MetaRow label="配置版本" value={detail.configVersion} />
+                    <MetaRow label="同步状态" value={syncStatusLabel(detail.lastConfigSyncStatus)} />
+                    <MetaRow label="同步时间" value={formatDateTime(detail.lastConfigSyncAt)} />
+                  </div>
+                </div>
+
+                <div className="surface-subpanel surface-subpanel--wide">
+                  <span className="label-overline">摘要</span>
+                  <p>{chineseOnlyText(detail.summary, "--")}</p>
+                </div>
+
+                <div className="surface-subpanel surface-subpanel--wide">
+                  <span className="label-overline">方法签名</span>
+                  <p>{chineseOnlyText(detail.methodSignature, "--")}</p>
+                </div>
+
+                <div className="surface-subpanel surface-subpanel--wide">
+                  <span className="label-overline">异常消息</span>
+                  <pre className="json-block">{chineseOnlyText(detail.message, "--")}</pre>
+                </div>
+
+                <div className="surface-subpanel surface-subpanel--wide">
+                  <span className="label-overline">完整堆栈</span>
+                  <pre className="stack-console">{chineseOnlyText(detail.stackTrace, "--")}</pre>
+                </div>
+
+                <div className="surface-subpanel surface-subpanel--wide">
+                  <span className="label-overline">参数快照</span>
+                  <pre className="json-block">{formatJsonText(detail.argumentsSnapshot)}</pre>
+                </div>
+
+                <div className="surface-subpanel surface-subpanel--wide">
+                  <span className="label-overline">this 快照</span>
+                  <pre className="json-block">{formatJsonText(detail.thisSnapshot)}</pre>
+                </div>
+
+                <div className="surface-subpanel surface-subpanel--wide">
+                  <span className="label-overline">Trace 上下文</span>
+                  <pre className="json-block">{formatJsonText(detail.traceContext)}</pre>
+                </div>
+              </div>
             </section>
           </div>
 

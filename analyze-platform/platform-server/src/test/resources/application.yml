@@ -1,0 +1,37 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:platformdb-test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+ai:
+  deepseek:
+    api-key: ""
+    base-url: https://api.deepseek.com/v1
+    model: deepseek-chat
+    timeout: 30000
+
+platform:
+  auth:
+    token-secret: zero-intrusion-local-secret-change-me
+    token-ttl-minutes: 480
+    agent-api-key: local-agent-key
+    users:
+      - username: admin
+        password: Admin@123
+        display-name: 管理员
+        role: ADMIN
+      - username: operator
+        password: Operator@123
+        display-name: 运维工程师
+        role: OPERATOR
+      - username: viewer
+        password: Viewer@123
+        display-name: 观察员
+        role: VIEWER
